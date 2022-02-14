@@ -1,11 +1,11 @@
 #include "led.h"
 #include "common.h"
 
-#define GPBCONF (*(volatile uint32_t*)0x30100010)
-#define GPBDATA (*(volatile uint32_t*)0x30100014)
-#define GPGCONF (*(volatile uint32_t*)0x30100060)
-#define GPGDATA (*(volatile uint32_t*)0x30100064)
-#define GPGUP (*(volatile uint32_t*)0x30100068)
+#define GPBCONF (*(volatile uint32_t*)0xb0000010)
+#define GPBDATA (*(volatile uint32_t*)0xb0000014)
+#define GPGCONF (*(volatile uint32_t*)0xb0000060)
+#define GPGDATA (*(volatile uint32_t*)0xb0000064)
+#define GPGUP (*(volatile uint32_t*)0xb0000068)
 
 #define GPB5_OUT (1<<10)
 #define GPB6_OUT (1<<12)

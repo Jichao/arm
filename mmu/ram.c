@@ -34,21 +34,19 @@ void enable_mmu(void)
     //create section translate table
     for (uint32_t i = 0; i < 4096; ++i) {
         uint32_t sec_base = i * (1<<20);
-        if (sec_base == 0x30100000) {
+        if (sec_base == 0xb0000000) {
             sec_base = 0x56000000;
-        } else if (sec_base == 0x30200000) {
-            sec_base = 0x30000000;
-        }
+        } 
         (*(uint32_t*)(SDRAM_BASE + i * 4)) =  sec_base + B16(00001100, 00010010);
     }
 
-    __asm__(
+    __asm__ (
         "ldr r0, =0x30000000\n"
         "mcr p15,0,r0,c2,c0,0\n" //ttb
         "ldr r0, =0x55555555\n"
         "mcr p15,0,r0,c3,c0,0\n" //domain access control register
         "mrc p15,0,r0,c1,c0,0\n"
-        "orr r1, #0x1\n"
+        "orr r0, #0x1\n"
         "mcr p15,0,r0,c1,c0,0\n" //enable mmu
         :
         :
