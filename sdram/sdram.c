@@ -20,7 +20,7 @@ void sdram_init(void)
     REFRESH = 0xac07a3;
 
     //enable brust & enable power down & eanble adaptive sclk & bank 64
-    BANKSIZE = 0xb1;
+    BANKSIZE = 0xb1; //0x1 disable brust & disable power down & disable adaptive sclk
 
     //cas latency 3 clocks(!!!)
     MRSRB6 = 0x30;
