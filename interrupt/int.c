@@ -41,9 +41,9 @@ void irq_handler(void)
     uint32_t off = INTOFFSET;
     if (off == EINT8_23_OFF) {
         handle_led(8, 0);
-        handle_led(11, 0);
-        handle_led(13, 0);
-        handle_led(14, 0);
+        handle_led(11, 1);
+        handle_led(13, 2);
+        handle_led(14, 3);
     }
     SRCPND = 1<<off;
     INTPND = 1<<off;
