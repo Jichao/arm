@@ -30,5 +30,7 @@ typedef char int8_t;
 
 #define SDRAM_BASE 0x30000000
 #define SDRAM_CODE_BASE (SDRAM_BASE + (4096*4))
+#define BOOL (1)
+#define FALSE (0)
 
 #endif

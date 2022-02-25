@@ -8,15 +8,11 @@ int main(void)
 {
     ram_init();
     nand_init();
-    nand_read(4096, 2048, (uint32_t*)SDRAM_CODE_BASE);
-
-    __asm__ (
-        "ldr sp, =0x34000000"
-        :
-        :
-    );
-
-    volatile t_void_func ptr = &led_control;
-    (*ptr)();
+    int result = nand_to_ram(4096, 2048, (uint8_t*)SDRAM_CODE_BASE);
+    if (result == 0) {
+        __asm__("ldr sp, =0x34000000" : :);
+        volatile t_void_func ptr = &led_control;
+        (*ptr)();
+    } 
     return 0;
 }

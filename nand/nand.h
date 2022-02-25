@@ -4,6 +4,7 @@
 #include "common.h"
 
 void nand_init(void);
-int nand_read(uint32_t start_addr, uint32_t size, uint8_t* ram_buffer);
+int nand_to_ram(uint32_t start_addr, uint32_t size, uint8_t* ram_addr);
+uint32_t nand_read_dev_id(void);
 
 #endif
