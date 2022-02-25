@@ -1,6 +1,6 @@
 CFLAGS 	:= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -ffreestanding -std=c99
-all: init.o main.o ram.o led.o int.o clock.o
-	arm-linux-ld -Tint.lds -o led.elf $^ 
+all: init.o main.o ram.o led.o int.o clock.o nand.o jump.o timer.o
+	arm-linux-ld -Tclock.lds -o led.elf $^ -lgcc -L/home/book/FriendlyARM/toolschain/4.4.3/lib/gcc/arm-none-linux-gnueabi/4.4.3
 	arm-linux-objcopy -O binary -S led.elf led.bin
 	arm-linux-objdump -D -m arm led.elf > leds.dis
 %.o:%.S

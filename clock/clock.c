@@ -1,33 +1,17 @@
 #include "common.h"
 #include "clock.h"
 
-#define CLKDIV (*(volatile uint32_t*)0x4c000014)
-#define MPLLCON (*(volatile uint32_t*)0x4c000004)
-#define CAMDIVN (*(volatile uint32_t*)0x4c000018)
-#define FIN_FREQ 12
-
 //mini2440
 //fclk:最高支持400MHz
 //hclk(ahb bus):给soc上的外设用的
 //pclk(apb bus):给其他外设用的
 
-void clock_init(void)
-{
-    __asm__ (
-        "mrc p15,0,r0,c1,c0,0\n"
-        "orr r0, r0, #0xc0000000\n"
-        "mcr p15,0,r0,c1,c0,0\n"
-    );
-    CLKDIV = 0x7;
-    MPLLCON = (0x7f << 12 | 2 << 4 | 1);
-}
-
-/*
 uint32_t get_fclk(void)
 {
-    uint32_t sdiv = MPLLCON & 3;
-    uint32_t pdiv = (MPLLCON >> 4) & ~(1<<6);
-    uint32_t mdiv = (MPLLCON >> 12) & ~(1<<8);
+    uint32_t pll = MPLLCON;
+    uint32_t sdiv = pll & 3;
+    uint32_t pdiv = (pll >> 4) & 0x3f;
+    uint32_t mdiv = (pll >> 12) & 0xff;
     return (2 * (mdiv + 8) * FIN_FREQ) / ((pdiv + 2) * (1 << sdiv));
 }
 
@@ -54,8 +38,18 @@ uint32_t get_hclk(void)
     return fclk;
 }
 
+uint32_t get_pclk(void)
+{
+    uint32_t pdiv = CLKDIV & 1;
+    if (pdiv) {
+        return get_hclk() / 2;
+    } else {
+        return get_hclk();
+    }
+}
+
+
 uint32_t get_min_hclk_cycle(uint32_t time_ns) 
 {
     return time_ns / (1000 / get_hclk()) + 1;
 }
-*/

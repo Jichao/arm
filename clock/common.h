@@ -25,6 +25,14 @@ typedef long int int32_t;
 typedef unsigned long int uint32_t;
 typedef long long int int64_t;
 typedef unsigned long long int uint64_t;
+typedef unsigned char uint8_t;
+typedef char int8_t;
+
+#define SDRAM_BASE 0x30000000
+#define SDRAM_CODE_BASE (SDRAM_BASE + (4096*4))
+#define BOOL int
+#define TRUE (1)
+#define FALSE (0)
 
 #define MAX(a, b) ((a > b) ? a : b)
 #define MIN(a, b) ((a > b) ? b : a)

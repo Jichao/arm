@@ -1,6 +1,7 @@
 #include "common.h"
 #include "int.h"
 #include "led.h"
+#include "timer.h"
 
 #define SRCPND (*(volatile uint32_t*)0x4A000000)
 #define INTMOD (*(volatile uint32_t*)0x4A000004)
@@ -13,6 +14,7 @@
 #define EINTPEND (*(volatile uint32_t*)0x560000a8)
 
 #define EINT8_23_OFF 5
+#define INT_TIMER0_OFF 10
 
 void interrupt_init(void)
 {
@@ -20,7 +22,7 @@ void interrupt_init(void)
     GPGCONF &= ~(3 | 3 << 6 | 3 << 10 | 3 << 12);
     GPGCONF |= (2 | 2 << 6 | 2 << 10 | 2 << 12);
     EINTMASK &= ~((1 << 8) | (1 << 11) | (1 << 13) | (1 << 14));
-    INTMSK &= ~(1 << 5);
+    INTMSK &= ~(1 << EINT8_23_OFF) & ~(1 << INT_TIMER0_OFF);
     __asm__ (
         "msr cpsr_c, 0x53"
         :
@@ -31,7 +33,7 @@ void interrupt_init(void)
 static void handle_led(uint32_t int_index, uint32_t led_index)
 {
     if (EINTPEND & (1 << int_index)) {
-        led_control(led_index);
+        invert_led(led_index);
         EINTPEND &= (1 << int_index);
     }
 }
@@ -44,6 +46,8 @@ void irq_handler(void)
         handle_led(11, 1);
         handle_led(13, 2);
         handle_led(14, 3);
+    } else if (off == INT_TIMER0_OFF) {
+        handle_timer0_interrupt();
     }
     SRCPND = 1<<off;
     INTPND = 1<<off;

@@ -23,6 +23,6 @@
 #define GPG6_IN (0xcfff)
 
 void led_init(void);
-void led_control(int index);
+void invert_led(int index);
 
 #endif
