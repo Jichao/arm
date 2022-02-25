@@ -23,8 +23,8 @@
 #define CAMDIVN (*(volatile uint32_t*)0x4c000018)
 #define FIN_FREQ 12
 
-#define NAND_SECTOR_SIZE_LP    2048
-#define NAND_BLOCK_MASK_LP     (NAND_SECTOR_SIZE_LP - 1)
+#define NAND_PAGE_SIZE 2048
+#define NAND_PAGE_ADDR_MASK (NAND_PAGE_SIZE - 1)
 
 //mini2440
 //fclk:最高支持400MHz
@@ -84,18 +84,13 @@ static void nand_write_addr(uint8_t addr)
 
 static void nand_write_addr32(uint32_t addr)
 {
-    uint32_t col = addr & NAND_BLOCK_MASK_LP;
-	uint32_t page = addr / NAND_SECTOR_SIZE_LP;
+    uint32_t col = addr & NAND_PAGE_ADDR_MASK;
+    uint32_t page = addr / NAND_PAGE_SIZE;
     NFADDR = col & 0xff; //a0-a7
-    manual_wait_cycle(10);
     NFADDR = (col >> 8) & 0xf; //a8-a11
-    manual_wait_cycle(10);
     NFADDR = page & 0xff; //a12-a19
-    manual_wait_cycle(10);
     NFADDR = (page >> 8) & 0xff; //a20-a27
-    manual_wait_cycle(10);
     NFADDR = (page >> 16) & 0x3; //a28
-    manual_wait_cycle(10);
 }
 
 static void nand_reset(void)
@@ -149,11 +144,10 @@ int nand_to_ram(uint32_t start_addr, uint32_t size, uint8_t* ram_addr)
     nand_reset();
     nand_select_chip();
     for (uint32_t addr = start_addr; addr < start_addr + size; addr += page_size) {
-        nand_clear_rnb();
         nand_write_cmd(0x00);
         nand_write_addr32(addr);
         nand_write_cmd(0x30);
-        nand_wait_rnb();
+        nand_wait_ready();
         for (uint32_t i = 0; i < page_size; i++) {
             *ram_addr = NFDATA;
             ram_addr++;
