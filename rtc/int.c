@@ -2,6 +2,7 @@
 #include "int.h"
 #include "led.h"
 #include "timer.h"
+#include "rtc.h"
 
 #define SRCPND (*(volatile uint32_t*)0x4A000000)
 #define INTMOD (*(volatile uint32_t*)0x4A000004)
@@ -16,6 +17,8 @@
 #define EINT8_23_OFF 5
 #define INT_TIMER0_OFF 10
 
+uint32_t g_last_sec[24];
+
 void interrupt_init(void)
 {
     //gpg-eint map: 0-8 3-11 5-13 6-14
@@ -28,6 +31,7 @@ void interrupt_init(void)
         :
         :
     );
+    memset(g_last_sec, 24, sizeof(uint32_t));
 }
 
 static void handle_led(uint32_t int_index, uint32_t led_index)
@@ -38,14 +42,40 @@ static void handle_led(uint32_t int_index, uint32_t led_index)
     }
 }
 
+static BOOL is_valid_interval(int index, int interval)
+{
+    uint32_t curr_count = get_sec_count();
+    if (g_last_sec[index] == 0) {
+        g_last_sec[index] = curr_count;
+        return TRUE;
+    }
+    if (curr_count - g_last_sec[index] > interval) {
+        g_last_sec[index] = curr_count;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void irq_handler(void)
 {
     uint32_t off = INTOFFSET;
     if (off == EINT8_23_OFF) {
         handle_led(8, 0);
         handle_led(11, 1);
-        handle_led(13, 2);
-        handle_led(14, 3);
+        if (EINTPEND & (1 << 13)) {
+            if (is_valid_interval(13, 0)) {
+                reset_time();
+            }
+            EINTPEND &= (1 << 13);
+        }
+        if (EINTPEND & (1 << 14)) {
+            if (is_valid_interval(14, 0)) {
+                output_time();
+            }
+            EINTPEND &= (1 << 14);
+        }
+        // handle_led(13, 2);
+        // handle_led(14, 3);
     } else if (off == INT_TIMER0_OFF) {
         handle_timer0_interrupt();
     }
