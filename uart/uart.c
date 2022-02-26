@@ -59,6 +59,7 @@ int uart_get_string(char* buff, int out_size)
     char ch;
     do {
         ch = getc();
+        putc(ch);
         *buff = ch;
         buff++;
         size++;
