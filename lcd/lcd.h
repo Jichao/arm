@@ -6,6 +6,6 @@
 void lcd_init(void);
 void lcd_power(BOOL power_inv, BOOL ponwer);
 void lcd_enable(BOOL on);
-void clear_screen(uint32_t color);
+void clear_screen(uint16_t color);
 
 #endif

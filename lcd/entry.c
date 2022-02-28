@@ -17,7 +17,7 @@ void test_lcd(void)
     lcd_init();
     lcd_power(0, 1);
     lcd_enable(TRUE);
-    clear_screen(0b11111);
+    clear_screen(0xff00);
 }
 
 void entry(void)

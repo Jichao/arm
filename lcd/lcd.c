@@ -18,29 +18,31 @@
 #define LCDSADDR2 (*(volatile uint32_t*)0X4D000014)
 #define LCDSADDR3 (*(volatile uint32_t*)0X4D000018)
 #define TPAL (*(volatile uint32_t*)0X4D000050)
+#define LCDINTMSK  (*(volatile unsigned *)0x4d00005c)	//LCD Interrupt mask
+#define TCONSEL     (*(volatile unsigned *)0x4d000060)	//LPC3600 Control --- edited by junon
 #define PALETTE     0x4d000400
 
 #define TD35_VCLK 7.1
 #define TD35_VBPD 0
 #define TD35_VFPD 0
 #define TD35_VSPW 9
-#define TD32_HEIGHT 320
-#define TD35_LINEVAL (TD32_HEIGHT - 1)
+#define TD35_HEIGHT 320
+#define TD35_LINEVAL (TD35_HEIGHT - 1)
 
 #define TD35_HBPD 100 
 #define TD35_HFPD 0
 #define TD35_HSPW 4
-#define TD32_WIDTH 240
-#define TD35_HORZVAL (TD32_WIDTH - 1)
+#define TD35_WIDTH 240
+#define TD35_HORZVAL (TD35_WIDTH - 1)
 
 #define TFT_LCD_TYPE 3
-#define TFT_8BPP 0xc 
+#define TFT_16BPP 0xc 
 
 #define ENVID_DISABLE   0
 #define ENVID_ENABLE    1
 
-#define FORMAT8BPP_5551 0
-#define FORMAT8BPP_565  1
+#define FORMAT_16BPP_5551 0
+#define FORMAT_16BPP_565  1
 
 #define VCLK_NORM 0
 #define VCLK_INV 1
@@ -60,12 +62,13 @@
 #define VDEN_NORM 0
 #define VDEN_INV 0
 
-#define LCDFRAMEBUFFER 0x30800000
+volatile static unsigned short LCD_BUFFER[TD35_HEIGHT][TD35_WIDTH];
+
 #define LOWER21BITS(n)  ((n) & 0x1fffff)
 
 static uint32_t _xsize;
 static uint32_t _ysize;
-static uint32_t* _frame_buffer;
+static uint16_t* _frame_buffer;
 
 static void lcd_port_init(void)
 {
@@ -96,7 +99,7 @@ static void lcd_palette_init(void)
     }
 }
 
-static void set_pixel(uint32_t x, uint32_t y, uint32_t color)
+static void set_pixel(uint32_t x, uint32_t y, uint16_t color)
 {
     *(_frame_buffer + y * _xsize + x) = color;
 }
@@ -108,22 +111,27 @@ void lcd_init(void)
     int clk_div = (int)(get_hclk() / 2. / 7.1) - 1;
     printf("clv div = %d\n", clk_div);
 
-    LCDCON1 = (clk_div << 8) | (TFT_LCD_TYPE << 5) | (TFT_8BPP << 1) | (ENVID_DISABLE);
+    LCDCON1 = (clk_div << 8) | (TFT_LCD_TYPE << 5) | (TFT_16BPP << 1) | (ENVID_DISABLE);
     LCDCON2 = (TD35_VBPD << 24) | (TD35_LINEVAL << 14) | (TD35_VFPD << 6) | TD35_VSPW;
     LCDCON3 = (TD35_HBPD << 19) | (TD35_HORZVAL << 8) | TD35_HFPD;
     LCDCON4 = TD35_HSPW;
-    LCDCON5 = (FORMAT8BPP_565 << 11) | (VCLK_INV << 10) | (VLINE_INV << 9) |
+    LCDCON5 = (FORMAT_16BPP_565 << 11) | (VCLK_INV << 10) | (VLINE_INV << 9) |
               (VSYNC_INV << 8) | HWSWP;
 
-    LCDSADDR1 = ((LCDFRAMEBUFFER>>22)<<21) | LOWER21BITS(LCDFRAMEBUFFER>>1);
-    LCDSADDR2 = LOWER21BITS((LCDFRAMEBUFFER + TD32_WIDTH*TD32_HEIGHT*2)>>1);
-    LCDSADDR3 = TD32_WIDTH;
-    TPAL = 0;
+#define LCD_ADDR ((uint32_t)LCD_BUFFER)
+
+    LCDSADDR1 = ((LCD_ADDR>>22)<<21) | LOWER21BITS(LCD_ADDR>>1);
+    LCDSADDR2 = LOWER21BITS((LCD_ADDR + TD35_WIDTH*TD35_HEIGHT*2)>>1);
+    LCDSADDR3 = TD35_WIDTH;
+
+    LCDINTMSK |= 3;
+  	TCONSEL   &= (~7);
+    TPAL     = 0x0;
+   	TCONSEL &= ~((1<<4) | 1);
 
     lcd_palette_init();
     _xsize = 240;
     _ysize = 320;
-    _frame_buffer = (uint32_t*)LCDFRAMEBUFFER;
 }
 
 void lcd_power(BOOL invpwren, BOOL pwren)
@@ -146,11 +154,11 @@ void lcd_enable(BOOL on)
     }
 }
 
-void clear_screen(uint32_t color) 
+void clear_screen(uint16_t color) 
 {
     for (uint32_t y = 0; y < _ysize; ++y) {
         for (uint32_t x = 0; x < _xsize; ++x) {
-            set_pixel(x, y, 1);
+            LCD_BUFFER[y][x] = color;
         }
     }
 }
