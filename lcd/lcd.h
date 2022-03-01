@@ -7,5 +7,7 @@ void lcd_init(void);
 void lcd_power(BOOL power_inv, BOOL ponwer);
 void lcd_enable(BOOL on);
 void clear_screen(uint16_t color);
+void test_rect(void);
+void draw_24bmp(uint8_t* bytes, int width, int height, int offx, int offy);
 
 #endif

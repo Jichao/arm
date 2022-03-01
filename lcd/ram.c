@@ -9,6 +9,8 @@
 #define MRSRB6 (*(volatile uint32_t*)0x4800002C)
 
 #define SDRAM_BASE 0x30000000
+#define BSS_BASE 0x33c00000
+#define BSS_SIZE 1024*100
 #define EM63_TRCD_NS 20
 #define EM63_TRC_NS 60
 #define EM63_TRP_NS 18
@@ -103,4 +105,8 @@ void ram_init(void)
 {
     enable_sdram();
     enable_mmu_and_cache();
+
+    for (uint32_t i = BSS_BASE; i < BSS_BASE + BSS_SIZE; i += 4) {
+        *((uint32_t*)(i)) = 0;
+    }
 }

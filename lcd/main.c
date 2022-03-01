@@ -31,7 +31,7 @@ int main(void)
     if ((dev_id & 0xda) != 0xda) {
         return 0;
     }
-    int result = nand_to_ram(4096, 2048 * 10, (uint8_t*)SDRAM_CODE_BASE);
+    int result = nand_to_ram(4096, 2048 * 200, (uint8_t*)SDRAM_CODE_BASE);
     if (result == 0) {
         entry();
     }

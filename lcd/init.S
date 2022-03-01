@@ -1,14 +1,14 @@
 .text
 .global _start
 _start:
-    b reset
-    b undefined_instruction
-    b software_interrupt
-    b prefetch_abort
-    b data_abort
-    b unused
-    b irq
-    b fiq
+    b reset                 //0
+    b undefined_instruction //4
+    b software_interrupt    //8
+    b prefetch_abort        //c
+    b data_abort            //10
+    b unused                //14
+    b irq                   //18
+    b fiq                   //20
 
 reset:
     mov sp, #4096
