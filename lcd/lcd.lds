@@ -9,9 +9,9 @@ SDRAM 64M
 */
 SECTIONS {
     . = 0x0;
-    first : {init.o main.o ram.o nand.o}
+    .text1 : {init.o(.text) main.o(.text) ram.o(.text) nand.o(.text)}
     . = 0x30004000;
-    second : AT(4096) { int.o led.o clock.o entry.o timer.o uart.o rtc.o lcd.o}
+    .text2 : AT(4096) { *(.text) }
     . = 0x33c00000;
     .bss : {*(.bss)}
 }

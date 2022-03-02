@@ -24,7 +24,7 @@
 #define UNUSED_INTERRUPT 5
 #define FIQ_INTERRUPT 7
 
-//uint32_t _last_sec[24];
+uint32_t _last_sec[24];
 
 void interrupt_init(void)
 {
@@ -36,7 +36,7 @@ void interrupt_init(void)
     __asm__ (
         "msr cpsr_c, 0x53"
     );
-    //memset(_last_sec, 24, sizeof(uint32_t));
+    memset(_last_sec, 24, sizeof(uint32_t));
 }
 
 static void handle_led(uint32_t int_index, uint32_t led_index)

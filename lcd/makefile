@@ -9,7 +9,7 @@ all: init.o main.o ram.o led.o int.o clock.o nand.o entry.o timer.o uart.o rtc.o
 %.o:%.c
 	arm-linux-gcc $(CFLAGS) -c $^
 clean:
-	rm *.o *.elf *.bin
+	rm *.o *.elf *.bin *.dis
 
 ../lib/src/libc.a:
 	cd ../lib/src; make; cd ../../rtc;

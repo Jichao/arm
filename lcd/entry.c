@@ -30,8 +30,7 @@ void test_lcd(void)
     getc();
 
     printf("draw girl\r\n");
-    draw_16bmp(sunflower_240x320, 240, 320, 0, 0);
-    // draw_24bmp(girl_180x320, 180, 320, 30, 0);
+    draw_24bmp(girl_180x320, 180, 320, 30, 0);
     getc();
 
     printf("lcd test done turning off\r\n");
