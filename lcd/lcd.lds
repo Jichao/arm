@@ -13,8 +13,4 @@ SECTIONS {
 
     . = 0x30004000;
     .text2 : AT(4096) { *(.text) }
-
-    _bss_start = 0x30200000;
-    .bss : {*(.bss) *(COMMON)}
-    _bss_end = .;
 }
