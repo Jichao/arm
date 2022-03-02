@@ -48,8 +48,8 @@ void entry(void)
     interrupt_init();
     printf("interupt inited\r\n");
 
-    set_timer0(2*1000, TRUE, &on_timer);
-    printf("timer0 inited\r\n");
+    // set_timer0(2*1000, TRUE, &on_timer);
+    // printf("timer0 inited\r\n");
     test_lcd();
     while (1) ;
 }
