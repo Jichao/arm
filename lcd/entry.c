@@ -45,11 +45,13 @@ void entry(void)
     uart_init(115200);
     printf("uart inited\r\n");
 
+    // disable_timer(-1);
     interrupt_init();
     printf("interupt inited\r\n");
 
-    // set_timer0(2*1000, TRUE, &on_timer);
-    // printf("timer0 inited\r\n");
-    test_lcd();
-    while (1) ;
+    //set_timer0(2*1000, TRUE, &on_timer);
+    printf("timer0 inited\r\n");
+    while (1) {
+        test_lcd();
+    }
 }

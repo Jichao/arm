@@ -36,7 +36,7 @@ void interrupt_init(void)
     __asm__ (
         "msr cpsr_c, 0x53"
     );
-    memset(_last_sec, 0, sizeof(_last_sec));
+    memset(_last_sec, 0, sizeof(uint32_t));
 }
 
 static void handle_led(uint32_t int_index, uint32_t led_index)

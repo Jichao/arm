@@ -11,7 +11,29 @@ volatile timeout_callback_t timer0_callback;
 
 void handle_timer0_interrupt()
 {
-    timer0_callback();
+    printf("timer0 interrupted\r\n");
+    // if (timer0_callback != 0) {
+        // timer0_callback();
+    // }
+}
+
+void disable_timer(int index)
+{
+    if (index == 0) {
+        TCON &= ~1;
+    } 
+    if (index == 2) {
+        TCON &= ~(1 << 8);
+    }
+    if (index == 3) {
+        TCON &= ~(1 << 12);
+    } 
+    if (index == 4) {
+        TCON &= ~(1 << 20);
+    }
+    if (index == -1) {
+        TCON &= ~1 & ~(1<<8) & ~(1<<12) & ~(1<<20);
+    }
 }
 
 void set_timer0(uint32_t ms, int repeat, timeout_callback_t callback)
