@@ -14,13 +14,7 @@ SECTIONS {
     . = 0x30004000;
     .text2 : AT(4096) { *(.text) }
 
-    rodata_addr = (LOADADDR(.text2) + SIZEOF(.text2) + 3) & ~(0x3);
-    .rodata : AT(rodata_addr) { *(.rodata*)}
-
-    data_addr = (LOADADDR(.rodata) + SIZEOF(.rodata) + 3) & ~(0x3);
-    .data : AT(data_addr) { *(.data)}
-
-    _bss_start = .;
+    _bss_start = 0x30200000;
     .bss : {*(.bss) *(COMMON)}
     _bss_end = .;
 }
