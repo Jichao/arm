@@ -10,11 +10,16 @@ SDRAM 64M
 SECTIONS {
     . = 0x0;
     .text1 : {init.o(.text) main.o(.text) ram.o(.text) nand.o(.text)}
+
     . = 0x30004000;
     .text2 : AT(4096) { *(.text) }
-    data_addr = (LOADADDR(.text2) + SIZEOF(.text2) + 3) & ~(0x3);
-    .data : AT(data_addr) 
-        { *(.data) *(.rodata*)}
+
+    rodata_addr = (LOADADDR(.text2) + SIZEOF(.text2) + 3) & ~(0x3);
+    .rodata : AT(rodata_addr) { *(.rodata*)}
+
+    data_addr = (LOADADDR(.rodata) + SIZEOF(.rodata) + 3) & ~(0x3);
+    .data : AT(data_addr) { *(.data)}
+
     _bss_start = .;
     .bss : {*(.bss) *(COMMON)}
     _bss_end = .;
