@@ -86,7 +86,7 @@ void enable_mmu_and_cache(void)
     }
 
     //enable icache/dcache/write buffer, disable alignment check
-    //c1 = c1 or B16(00010000,00001110);
+    //c1 = c1 or B16(00010000,00001111);
     __asm__ (
         "ldr r0, =0x30000000\n"
         "mcr p15,0,r0,c2,c0,0\n" //ttb

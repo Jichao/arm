@@ -1,5 +1,7 @@
 #include "common.h"
 #include "nand.h"
+#include "timer.h"
+#include "clock.h"
 
 #define NFCONF (*(volatile uint32_t*)0x4E000000)
 #define NFCONT (*(volatile uint32_t*)0x4E000004)
