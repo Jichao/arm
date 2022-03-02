@@ -12,6 +12,10 @@ SECTIONS {
     .text1 : {init.o(.text) main.o(.text) ram.o(.text) nand.o(.text)}
     . = 0x30004000;
     .text2 : AT(4096) { *(.text) }
-    . = 0x33c00000;
-    .bss : {*(.bss)}
+    data_addr = (LOADADDR(.text2) + SIZEOF(.text2) + 3) & ~(0x3);
+    .data : AT(data_addr) 
+        { *(.data) *(.rodata*)}
+    _bss_start = .;
+    .bss : {*(.bss) *(COMMON)}
+    _bss_end = .;
 }
