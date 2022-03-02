@@ -36,7 +36,7 @@ void interrupt_init(void)
     __asm__ (
         "msr cpsr_c, 0x53"
     );
-    memset(_last_sec, 24, sizeof(uint32_t));
+    memset(_last_sec, 0, sizeof(_last_sec));
 }
 
 static void handle_led(uint32_t int_index, uint32_t led_index)
@@ -49,7 +49,6 @@ static void handle_led(uint32_t int_index, uint32_t led_index)
 
 static BOOL is_valid_interval(int index, int interval)
 {
-    /*
     uint32_t curr_count = get_sec_count();
     if (_last_sec[index] == 0) {
         _last_sec[index] = curr_count;
@@ -58,7 +57,7 @@ static BOOL is_valid_interval(int index, int interval)
     if (curr_count - _last_sec[index] > interval) {
         _last_sec[index] = curr_count;
         return TRUE;
-    }*/
+    }
     return TRUE;
 }
 

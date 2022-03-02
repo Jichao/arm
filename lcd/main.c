@@ -33,6 +33,7 @@ int main(void)
     }
     int result = nand_to_ram(4096, 2048 * 200, (uint8_t*)SDRAM_CODE_BASE);
     if (result == 0) {
+        bss_zero();
         entry();
     }
     return result;

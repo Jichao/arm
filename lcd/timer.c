@@ -7,7 +7,7 @@
 #define TCNTB0 (*(volatile uint32_t*)0x5100000C)
 #define TCMPB0 (*(volatile uint32_t*)0x51000010)
 
-timeout_callback_t timer0_callback;
+volatile timeout_callback_t timer0_callback;
 
 void handle_timer0_interrupt()
 {
