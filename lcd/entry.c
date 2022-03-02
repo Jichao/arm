@@ -15,6 +15,8 @@ void on_timer(void)
 
 void test_lcd(void)
 {
+    printf("start test lcd\r\n");
+
     lcd_init();
     lcd_power(0, 1);
     lcd_enable(TRUE);
@@ -28,9 +30,11 @@ void test_lcd(void)
     getc();
 
     printf("draw girl\r\n");
-    draw_24bmp(girl_180x320, 180, 320, 30, 0);
+    draw_16bmp(sunflower_240x320, 240, 320, 0, 0);
+    // draw_24bmp(girl_180x320, 180, 320, 30, 0);
     getc();
 
+    printf("lcd test done turning off\r\n");
     lcd_enable(FALSE);
     lcd_power(0, 0);
 }
@@ -38,10 +42,15 @@ void test_lcd(void)
 void entry(void)
 {
     led_init();
+
     uart_init(115200);
-    printf("\r\nentry good\r\n");
+    printf("uart inited\r\n");
+
     interrupt_init();
+    printf("interupt inited\r\n");
+
     set_timer0(2*1000, TRUE, &on_timer);
+    printf("timer0 inited\r\n");
     test_lcd();
     while (1) ;
 }

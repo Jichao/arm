@@ -122,7 +122,19 @@ static void set_pixel(uint32_t x, uint32_t y, uint16_t c)
     if (x < TD35_WIDTH && y < TD35_HEIGHT) {
         uint16_t *addr = (uint16_t *)FRAMEBUFFER + y * TD35_WIDTH + x;
         *addr = c;
-    }
+    } else {
+		printf("set_pixel invalid range x = %d, y = %d\r\n", x, y);
+	}
+}
+
+void draw_16bmp(uint8_t* bytes, int width, int height, int offx, int offy)
+{
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			uint8_t* pixel = (uint8_t*)(bytes + (y * width + x) * 2);
+			set_pixel(x + offx, y + offy, (pixel[0] << 8) | pixel[1]);
+		}
+	}
 }
 
 void draw_24bmp(uint8_t* bytes, int width, int height, int offx, int offy)
@@ -130,9 +142,9 @@ void draw_24bmp(uint8_t* bytes, int width, int height, int offx, int offy)
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
 			uint8_t* pixel = (uint8_t*)(bytes + (y * width + x) * 3);
-			int r = pixel[0] / 255. * (1 << 5);
-			int g = pixel[1] / 255. * (1 << 6);
-			int b = pixel[2] / 255. * (1 << 5);
+			int r = pixel[0] / 255. * ((1 << 5) - 1);
+			int g = pixel[1] / 255. * ((1 << 6) - 1);
+			int b = pixel[2] / 255. * ((1 << 5) - 1);
 			uint16_t c = (r << 11 | g << 6 | b);
 			set_pixel(x + offx, y + offy, c);
         }
@@ -146,7 +158,6 @@ void clear_screen(uint16_t color) {
 		}
 	}
 }
-
 
 static void Glib_Line(int x1,int y1,int x2,int y2, uint16_t color)
 {

@@ -17,7 +17,14 @@
 #define EINT8_23_OFF 5
 #define INT_TIMER0_OFF 10
 
-uint32_t g_last_sec[24];
+#define UNDEF_INSTRUCTION 1
+#define SOFTWARE_INTERRUPT 2
+#define PREFETCH_ABORT 3
+#define DATA_ABORT 4
+#define UNUSED_INTERRUPT 5
+#define FIQ_INTERRUPT 7
+
+uint32_t _last_sec[24];
 
 void interrupt_init(void)
 {
@@ -28,10 +35,8 @@ void interrupt_init(void)
     INTMSK &= ~(1 << EINT8_23_OFF) & ~(1 << INT_TIMER0_OFF);
     __asm__ (
         "msr cpsr_c, 0x53"
-        :
-        :
     );
-    memset(g_last_sec, 24, sizeof(uint32_t));
+    memset(_last_sec, 24, sizeof(uint32_t));
 }
 
 static void handle_led(uint32_t int_index, uint32_t led_index)
@@ -45,12 +50,12 @@ static void handle_led(uint32_t int_index, uint32_t led_index)
 static BOOL is_valid_interval(int index, int interval)
 {
     uint32_t curr_count = get_sec_count();
-    if (g_last_sec[index] == 0) {
-        g_last_sec[index] = curr_count;
+    if (_last_sec[index] == 0) {
+        _last_sec[index] = curr_count;
         return TRUE;
     }
-    if (curr_count - g_last_sec[index] > interval) {
-        g_last_sec[index] = curr_count;
+    if (curr_count - _last_sec[index] > interval) {
+        _last_sec[index] = curr_count;
         return TRUE;
     }
     return FALSE;
@@ -81,4 +86,34 @@ void irq_handler(void)
     }
     SRCPND = 1<<off;
     INTPND = 1<<off;
+}
+
+void exception_handler(int index, uint32_t lastpc)
+{
+    printf("last pc = %0x\r\n", lastpc);
+    switch (index) {
+    case UNDEF_INSTRUCTION:
+        printf("undefined instruction exception\r\n");
+        break;
+    case PREFETCH_ABORT:
+        printf("prefetch abort exception\r\n");
+        break;
+    case DATA_ABORT:
+        printf("data abort exception\r\n");
+        break;
+    case UNUSED_INTERRUPT:
+        printf("unused interrupt\r\n");
+        break;
+    case SOFTWARE_INTERRUPT:
+        printf("software interrupt\r\n");
+        break;
+    case FIQ_INTERRUPT:
+        printf("fiq interrupt\r\n");
+        break;
+    default:
+        printf("unknown interrupt\r\n");
+        break;
+    }
+    printf("unhandled now entering fuck mode\r\n");
+    while (1) ; 
 }

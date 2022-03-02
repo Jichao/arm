@@ -101,12 +101,16 @@ void enable_mmu_and_cache(void)
     );
 }
 
+static void bss_zero(void)
+{
+    for (uint32_t i = BSS_BASE; i < BSS_BASE + BSS_SIZE; i += 4) {
+        *((uint32_t*)(i)) = 0;
+    }
+}
+
 void ram_init(void)
 {
     enable_sdram();
     enable_mmu_and_cache();
-
-    for (uint32_t i = BSS_BASE; i < BSS_BASE + BSS_SIZE; i += 4) {
-        *((uint32_t*)(i)) = 0;
-    }
+    bss_zero();
 }

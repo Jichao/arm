@@ -33,9 +33,26 @@ irq_ret:
     ldmia sp!, {r0-r12, pc}^
     
 undefined_instruction:
+    mov r0, #1
+    mov r1, lr
+    ldr pc, =exception_handler
 software_interrupt:
+    mov r0, #2
+    mov r1, lr
+    ldr pc, =exception_handler
 prefetch_abort:
+    mov r0, #3
+    sub lr, lr, #4
+    mov r1, lr 
+    ldr pc, =exception_handler
 data_abort:
+    sub lr, lr, #8
+    mov r0, #4
+    mov r1, lr
+    ldr pc, =exception_handler
 unused:
+    mov r0, #5
+    ldr pc, =exception_handler
 fiq:
-    b undefined_instruction
+    mov r0, #7
+    ldr pc, =exception_handler

@@ -131,9 +131,9 @@ int nand_to_ram(uint32_t start_addr, uint32_t size, uint8_t* ram_addr)
     if (size % page_size != 0) {
         return -1;
     }
-    nand_reset();
-    nand_select_chip();
     for (uint32_t addr = start_addr; addr < start_addr + size; addr += page_size) {
+        nand_reset();
+        nand_select_chip();
         nand_write_cmd(0x00);
         nand_write_addr32(addr);
         nand_write_cmd(0x30);
@@ -142,7 +142,7 @@ int nand_to_ram(uint32_t start_addr, uint32_t size, uint8_t* ram_addr)
             *ram_addr = NFDATA;
             ram_addr++;
         }
+        nand_unselect_chip();
     }
-    nand_unselect_chip();
     return 0;
 }
