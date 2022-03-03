@@ -11,15 +11,15 @@ _start:
     b fiq                   //20
 
 reset:
-    mov sp, #4096
+    #mov sp, #4096
 
-    ldr   r0, =0x53000000     @ WATCHDOG寄存器地址
-    mov   r1, #0x0                     
-    str   r1, [r0]              @ 写入0，禁止WATCHDOG，否则CPU会不断重启
+    #ldr   r0, =0x53000000     @ WATCHDOG寄存器地址
+    #mov   r1, #0x0                     
+    #str   r1, [r0]              @ 写入0，禁止WATCHDOG，否则CPU会不断重启
 
-    msr cpsr_c, 0xd2
-    mov sp, #3072
-    msr cpsr_c, 0xd3
+    #msr cpsr_c, 0xd2
+    #mov sp, #3072
+    #msr cpsr_c, 0xd3
     bl main
 _loop:
     b _loop

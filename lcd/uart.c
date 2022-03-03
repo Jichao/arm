@@ -13,7 +13,6 @@
 #define UBRDIV0 (*(volatile uint32_t*)0x50000028)
 #define UTXH0 (*(volatile uint8_t*)0x50000020)
 #define URXH0 (*(volatile uint8_t*)0x50000024)
-#define UBRDIV0 (*(volatile uint32_t*)0x50000028)
 
 //init uart0
 void uart_init(int baudrate)
@@ -27,7 +26,7 @@ void uart_init(int baudrate)
     UFCON0 = 0x0; //disable fifo mode
     UCON0 = 0x5; //enable tx/rx 
     UMCON0 = 0x0; //disable afc
-    UBRDIV0 = 36;
+    UBRDIV0 = (int)(get_pclk() * 1000 * 1000 / (baudrate * 16)) - 1;
 }
 
 unsigned char getc(void)

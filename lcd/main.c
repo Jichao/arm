@@ -22,19 +22,10 @@ void clock_init(void)
 }
 
 int main(void)
-{
-    clock_init();
-    ram_init();
-    __asm__("ldr sp, =0x33ffffe0" : :);
-    nand_init();
-    uint32_t dev_id = nand_read_dev_id();
-    if ((dev_id & 0xda) != 0xda) {
-        return 0;
-    }
-    int result = nand_to_ram(4096, 2048 * 200, (uint8_t*)SDRAM_CODE_BASE);
-    if (result == 0) {
-        bss_zero();
-        entry();
-    }
-    return result;
+{  
+    // clock_init();
+    // ram_init();
+    bss_zero();
+    entry();
+    return 0;
 }

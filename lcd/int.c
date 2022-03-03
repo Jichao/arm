@@ -24,6 +24,7 @@
 #define UNUSED_INTERRUPT 5
 #define FIQ_INTERRUPT 7
 
+
 uint32_t _last_sec[24];
 
 void interrupt_init(void)
@@ -31,12 +32,22 @@ void interrupt_init(void)
     //gpg-eint map: 0-8 3-11 5-13 6-14
     GPGCONF &= ~(3 | 3 << 6 | 3 << 10 | 3 << 12);
     GPGCONF |= (2 | 2 << 6 | 2 << 10 | 2 << 12);
+
+    EINTMASK = 0x000fffff;
+    INTMSK = 0xffffffff;
+
+    memset(_last_sec, 0, sizeof(uint32_t));
+    uint32_t* orignal_handler = (uint32_t*)0;
+    uint32_t* new_handler = (uint32_t*)0x30000000;
+    for (int i = 0; i < 8; ++i) {
+        *orignal_handler++ = *new_handler++;       
+    }
+
     EINTMASK &= ~((1 << 8) | (1 << 11) | (1 << 13) | (1 << 14));
     INTMSK &= ~(1 << EINT8_23_OFF) & ~(1 << INT_TIMER0_OFF);
     __asm__ (
         "msr cpsr_c, 0x53"
     );
-    memset(_last_sec, 0, sizeof(uint32_t));
 }
 
 static void handle_led(uint32_t int_index, uint32_t led_index)

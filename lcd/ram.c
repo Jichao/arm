@@ -12,6 +12,7 @@
 #define EM63_TRCD_NS 20
 #define EM63_TRC_NS 60
 #define EM63_TRP_NS 18
+#define TTB 0x30100000
 
 extern int _bss_start, _bss_end;
 
@@ -82,13 +83,13 @@ void enable_mmu_and_cache(void)
         if (sec_base >= SDRAM_BASE && sec_base <= (SDRAM_BASE + (64 << 20))) {
             sec_desc = B16(00001100, 00011110);
         }
-        (*(uint32_t*)(SDRAM_BASE + i * 4)) =  sec_base + sec_desc;
+        (*(uint32_t*)(TTB + i * 4)) =  sec_base + sec_desc;
     }
 
     //enable icache/dcache/write buffer, disable alignment check
     //c1 = c1 or B16(00010000,00001111);
     __asm__ (
-        "ldr r0, =0x30000000\n"
+        "ldr r0, =0x30100000\n"
         "mcr p15,0,r0,c2,c0,0\n" //ttb
         "ldr r0, =0x55555555\n"
         "mcr p15,0,r0,c3,c0,0\n" //domain access control register

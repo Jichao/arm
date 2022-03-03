@@ -1,11 +1,11 @@
 #ifndef _LED_H_
 #define _LED_H_
 
-#define GPBCONF (*(volatile uint32_t*)0xb0000010)
-#define GPBDATA (*(volatile uint32_t*)0xb0000014)
-#define GPGCONF (*(volatile uint32_t*)0xb0000060)
-#define GPGDATA (*(volatile uint32_t*)0xb0000064)
-#define GPGUP (*(volatile uint32_t*)0xb0000068)
+#define GPBCONF (*(volatile uint32_t*)0x56000010)
+#define GPBDATA (*(volatile uint32_t*)0x56000014)
+#define GPGCONF (*(volatile uint32_t*)0x56000060)
+#define GPGDATA (*(volatile uint32_t*)0x56000064)
+#define GPGUP (*(volatile uint32_t*)0x56000068)
 
 #define GPB5_OUT (1<<10)
 #define GPB6_OUT (1<<12)
