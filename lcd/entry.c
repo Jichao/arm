@@ -40,18 +40,10 @@ void test_lcd(void)
 
 void entry(void)
 {
-    //printf("before led inited\r\n");
     led_init();
-    //printf("after led inited\r\n");
-
-    //printf("before uart inited\r\n");
-    //uart_init(11520);
-    //printf("uart init done\r\n");
-
     printf("before interrupt inited\r\n");
     interrupt_init();
     printf("interupt inited\r\n");
-
     set_timer0(2*1000, TRUE, &on_timer);
     printf("timer0 inited\r\n");
     while (1) {

@@ -145,7 +145,7 @@ void draw_24bmp(uint8_t* bytes, int width, int height, int offx, int offy)
 			int r = pixel[0] / 255. * ((1 << 5) - 1);
 			int g = pixel[1] / 255. * ((1 << 6) - 1);
 			int b = pixel[2] / 255. * ((1 << 5) - 1);
-			uint16_t c = (r << 11 | g << 6 | b);
+			uint16_t c = (r << 11 | g << 5 | b);
 			set_pixel(x + offx, y + offy, c);
         }
     }
