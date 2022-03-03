@@ -48,12 +48,12 @@ void entry(void)
     //uart_init(11520);
     //printf("uart init done\r\n");
 
-    //printf("before interrupt inited\r\n");
-    //interrupt_init();
-    //printf("interupt inited\r\n");
+    printf("before interrupt inited\r\n");
+    interrupt_init();
+    printf("interupt inited\r\n");
 
-    //set_timer0(2*1000, TRUE, &on_timer);
-    //printf("timer0 inited\r\n");
+    set_timer0(2*1000, TRUE, &on_timer);
+    printf("timer0 inited\r\n");
     while (1) {
         test_lcd();
     }

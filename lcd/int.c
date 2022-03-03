@@ -4,6 +4,8 @@
 #include "timer.h"
 #include "rtc.h"
 
+extern uint32_t _irq;
+
 #define SRCPND (*(volatile uint32_t*)0x4A000000)
 #define INTMOD (*(volatile uint32_t*)0x4A000004)
 #define INTMSK (*(volatile uint32_t*)0x4A000008)
@@ -24,25 +26,26 @@
 #define UNUSED_INTERRUPT 5
 #define FIQ_INTERRUPT 7
 
+#define IRQ_HANDLER_ADDR (*(volatile uint32_t*)0x33f80440)
 
 uint32_t _last_sec[24];
 
 void interrupt_init(void)
 {
+    memset(_last_sec, 0, sizeof(uint32_t));
     //gpg-eint map: 0-8 3-11 5-13 6-14
     GPGCONF &= ~(3 | 3 << 6 | 3 << 10 | 3 << 12);
     GPGCONF |= (2 | 2 << 6 | 2 << 10 | 2 << 12);
+    __asm__ (
+        "msr cpsr_c, 0xd3"
+    );
 
     EINTMASK = 0x000fffff;
     INTMSK = 0xffffffff;
 
-    memset(_last_sec, 0, sizeof(uint32_t));
-    uint32_t* orignal_handler = (uint32_t*)0;
-    uint32_t* new_handler = (uint32_t*)0x30000000;
-    for (int i = 0; i < 8; ++i) {
-        *orignal_handler++ = *new_handler++;       
-    }
-
+    IRQ_HANDLER_ADDR = 0xe59ff000; //ldr pc, [pc, #4]
+    *(&IRQ_HANDLER_ADDR + 1) = &_irq;
+    *(&IRQ_HANDLER_ADDR + 2) = &_irq;
     EINTMASK &= ~((1 << 8) | (1 << 11) | (1 << 13) | (1 << 14));
     INTMSK &= ~(1 << EINT8_23_OFF) & ~(1 << INT_TIMER0_OFF);
     __asm__ (

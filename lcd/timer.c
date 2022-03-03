@@ -7,14 +7,13 @@
 #define TCNTB0 (*(volatile uint32_t*)0x5100000C)
 #define TCMPB0 (*(volatile uint32_t*)0x51000010)
 
-volatile timeout_callback_t timer0_callback;
+volatile timeout_callback_t timer0_callback = 0;
 
 void handle_timer0_interrupt()
 {
     printf("timer0 interrupted\r\n");
-    // if (timer0_callback != 0) {
-        // timer0_callback();
-    // }
+    if (timer0_callback)
+        timer0_callback();
 }
 
 void disable_timer(int index)

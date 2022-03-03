@@ -1,5 +1,6 @@
 .text
 .global _start
+.global _irq
 _start:
     b reset                 //0
     b undefined_instruction //4
@@ -7,7 +8,7 @@ _start:
     b prefetch_abort        //c
     b data_abort            //10
     b unused                //14
-    b irq                   //18
+    b _irq                   //18
     b fiq                   //20
 
 reset:
@@ -24,7 +25,7 @@ reset:
 _loop:
     b _loop
 
-irq:
+_irq:
     sub lr, lr, #4
     stmdb sp!, {r0-r12, lr}
     ldr lr, =irq_ret
