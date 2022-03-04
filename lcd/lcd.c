@@ -77,7 +77,7 @@ void lcd_init(void)
 {
     lcd_port_init();
 
-    int clk_div = (int)(get_hclk() / 2. / 10) - 1;
+    int clk_div = (int)(get_hclk() / 2. / TD35_VCLK) - 1;
 	printf("hclk = %d\r\n", get_hclk());
     printf("clv div = %d\r\n", clk_div);
 
