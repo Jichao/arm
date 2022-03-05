@@ -4,7 +4,7 @@
 #include <assert.h>
 
 static void* get_ptr(int index) {
-    return (void*)(_meminfo->heap_start + index * SECTION_SIZE + 4);
+    return (void*)(_meminfo->heap_start + index * SECTION_SIZE);
 }
 
 void test_cont_malloc()

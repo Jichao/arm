@@ -5,3 +5,4 @@
 *.swp
 *.a
 *dsym*
+lcd/kmalloc_test

@@ -77,20 +77,19 @@ void* kmalloc(int size)
         set_bit(_meminfo->section_bits, i, 1);
     }
     uint32_t* ptr = (uint32_t*)((char*)_meminfo->heap_start + index * SECTION_SIZE);
-    *ptr = len;
+    _meminfo->section_len[index] = len;
     printf("index = %d, len= %d ptr = %p\r\n", index, len, ptr);
-    return (void*)(ptr + 1);
+    return ptr;
 }
 
 void kfree(void* ptr)
 {
-    uint32_t* real_ptr = (uint32_t*)(ptr - 4);
-     if ((uint32_t)real_ptr % SECTION_SIZE != 0) {
+     if ((uint32_t)ptr % SECTION_SIZE != 0) {
         printf("section free failed invalid pointer %p\r\n", ptr);
         return;
     }
-    int len = *real_ptr;
-    int index = get_section_index((uint32_t)real_ptr);
+    int index = get_section_index((uint32_t)ptr);
+    int len = _meminfo->section_len[index];
     for (int i = index; i < index + len; ++i) {
         set_bit(_meminfo->section_bits, i, 0);
     }
