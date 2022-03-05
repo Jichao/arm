@@ -9,7 +9,13 @@ all: init.o main.o ram.o led.o int.o clock.o nand.o entry.o timer.o uart.o rtc.o
 %.o:%.c
 	arm-linux-gcc $(CFLAGS) -c $^
 clean:
-	rm *.o *.elf *.bin *.dis
+	rm *.o *.elf *.bin *.dis *_test
+
+kmalloc_test: kmalloc_test.c kmalloc.c bits.c
+	gcc -DTEST -g -std=c99 kmalloc_test.c kmalloc.c bits.c -o kmalloc_test
+
+test: kmalloc_test
+	./kmalloc_test
 
 ../lib/src/libc.a:
 	cd ../lib/src; make; cd ../../rtc;

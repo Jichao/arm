@@ -75,6 +75,11 @@ static void lcd_port_init(void)
     GPDCON = 0xaaaaaaaa;
 }
 
+void lcd_uninit()
+{
+	kfree((void*)_framebuffer);
+}
+
 void lcd_init(void)
 {
     lcd_port_init();

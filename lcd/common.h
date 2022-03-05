@@ -21,6 +21,7 @@
 + ((unsigned long)B8(db3)<<8) \
 + B8(dlsb))
 
+#ifndef TEST
 typedef short int int16_t;
 typedef unsigned short int uint16_t;
 typedef long int int32_t;
@@ -29,6 +30,9 @@ typedef long long int int64_t;
 typedef unsigned long long int uint64_t;
 typedef unsigned char uint8_t;
 typedef char int8_t;
+#else
+#include <stdint.h>
+#endif
 
 #define SDRAM_BASE 0x30000000
 #define SDRAM_CODE_BASE (SDRAM_BASE + (4096*4))
@@ -41,4 +45,16 @@ typedef char int8_t;
 
 #define offsetof(st, m) \
     ((size_t)&(((st *)0)->m))
+
+#define kassert(cond, ...) \
+    if (!cond) { \
+        printf(__VA_ARGS__); \
+    }
+
+#define UDEBUG 0
+
+#define dprint(...) \
+    if (UDEBUG == 1) \
+        printf(__VA_ARGS); \
+
 #endif

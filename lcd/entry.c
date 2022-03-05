@@ -41,6 +41,7 @@ void test_lcd(void)
     printf("lcd test done turning off\r\n");
     lcd_enable(FALSE);
     lcd_power(0, 0);
+    lcd_uninit();
 }
 
 void entry(void)
@@ -49,7 +50,6 @@ void entry(void)
     kmalloc_init();
 
     printf("led inited\r\n");
-    led_init();
 
     printf("fclk %d hclk %d pclk %d\r\n", get_fclk(), get_hclk(), get_pclk());
 
