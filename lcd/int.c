@@ -44,8 +44,8 @@ void interrupt_init(void)
     INTMSK = 0xffffffff;
 
     IRQ_HANDLER_ADDR = 0xe59ff000; //ldr pc, [pc, #4]
-    *(&IRQ_HANDLER_ADDR + 1) = &_irq;
-    *(&IRQ_HANDLER_ADDR + 2) = &_irq;
+    *(&IRQ_HANDLER_ADDR + 1) = (uint32_t)&_irq;
+    *(&IRQ_HANDLER_ADDR + 2) = (uint32_t)&_irq;
     EINTMASK &= ~((1 << 8) | (1 << 11) | (1 << 13) | (1 << 14));
     INTMSK &= ~(1 << EINT8_23_OFF) & ~(1 << INT_TIMER0_OFF);
     __asm__ (

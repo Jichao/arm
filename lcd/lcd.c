@@ -1,6 +1,7 @@
 #include "lcd.h"
 #include "common.h"
 #include "clock.h"
+#include "kmalloc.h"
 
 #define GPCCON (*(volatile uint32_t*)0x56000020)
 #define GPCUP (*(volatile uint32_t*)0x56000028)
@@ -62,8 +63,9 @@
 #define VDEN_NORM 0
 #define VDEN_INV 0
 
-#define FRAMEBUFFER 0x30a00000
 #define LOWER21BITS(n)  ((n) & 0x1fffff)
+
+uint32_t _framebuffer;
 
 static void lcd_port_init(void)
 {
@@ -81,6 +83,8 @@ void lcd_init(void)
 	printf("hclk = %d\r\n", get_hclk());
     printf("clv div = %d\r\n", clk_div);
 
+	_framebuffer = (uint32_t)kmalloc(2 * TD35_WIDTH * TD35_HEIGHT);
+	printf("frame buffer = 0x%x\r\n", _framebuffer);
     LCDCON1 = (clk_div << 8) | (TFT_LCD_TYPE << 5) | (TFT_16BPP << 1) | (ENVID_DISABLE);
     LCDCON2 = (TD35_VBPD << 24) | (TD35_LINEVAL << 14) | (TD35_VFPD << 6) | TD35_VSPW;
     LCDCON3 = (TD35_HBPD << 19) | (TD35_HORZVAL << 8) | TD35_HFPD;
@@ -88,8 +92,8 @@ void lcd_init(void)
     LCDCON5 = (FORMAT_16BPP_565 << 11) | (VCLK_INV << 10) | (VLINE_INV << 9) |
               (VSYNC_INV << 8) | HWSWP;
 
-    LCDSADDR1 = ((FRAMEBUFFER>>22)<<21) | LOWER21BITS(FRAMEBUFFER>>1);
-    LCDSADDR2 = LOWER21BITS((FRAMEBUFFER + TD35_WIDTH*TD35_HEIGHT*2)>>1);
+    LCDSADDR1 = ((_framebuffer>>22)<<21) | LOWER21BITS(_framebuffer>>1);
+    LCDSADDR2 = LOWER21BITS((_framebuffer + TD35_WIDTH*TD35_HEIGHT*2)>>1);
     LCDSADDR3 = TD35_WIDTH;
 
     LCDINTMSK |= 3;
@@ -120,7 +124,7 @@ void lcd_enable(BOOL on)
 static void set_pixel(uint32_t x, uint32_t y, uint16_t c)
 {
     if (x < TD35_WIDTH && y < TD35_HEIGHT) {
-        uint16_t *addr = (uint16_t *)FRAMEBUFFER + y * TD35_WIDTH + x;
+        uint16_t *addr = (uint16_t *)_framebuffer + y * TD35_WIDTH + x;
         *addr = c;
     } else {
 		printf("set_pixel invalid range x = %d, y = %d\r\n", x, y);

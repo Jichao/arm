@@ -1,4 +1,6 @@
 #include "entry.h"
+#include "clock.h"
+#include "kmalloc.h"
 #include "led.h"
 #include "int.h"
 #include "timer.h"
@@ -7,6 +9,9 @@
 #include "stdio.h"
 #include "lcd.h"
 #include "girl.h"
+
+extern char _ram_start;
+extern char _bss_end;
 
 void on_timer(void)
 {
@@ -40,10 +45,18 @@ void test_lcd(void)
 
 void entry(void)
 {
+    printf("bbs end %p ram start %p rom size %x\r\n", &_bss_end, &_ram_start, ((int)&_bss_end - (int)&_ram_start));
+    kmalloc_init();
+
+    printf("led inited\r\n");
     led_init();
+
+    printf("fclk %d hclk %d pclk %d\r\n", get_fclk(), get_hclk(), get_pclk());
+
     printf("before interrupt inited\r\n");
     interrupt_init();
     printf("interupt inited\r\n");
+
     set_timer0(2*1000, TRUE, &on_timer);
     printf("timer0 inited\r\n");
     while (1) {

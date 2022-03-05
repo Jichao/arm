@@ -11,7 +11,6 @@ volatile timeout_callback_t timer0_callback = 0;
 
 void handle_timer0_interrupt()
 {
-    printf("timer0 interrupted\r\n");
     if (timer0_callback)
         timer0_callback();
 }

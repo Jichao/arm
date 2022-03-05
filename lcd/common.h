@@ -1,6 +1,8 @@
 #ifndef _COMMON_HEADER_
 #define _COMMON_HEADER_
 
+#include "stdio.h"
+
 #define HEX__(n) 0x##n##LU
 #define B8__(x) ((x&0x0000000FLU)?1:0) \
 +((x&0x000000F0LU)?2:0) \
@@ -37,6 +39,6 @@ typedef char int8_t;
 #define MAX(a, b) ((a > b) ? a : b)
 #define MIN(a, b) ((a > b) ? b : a)
 
-#include "stdio.h"
-
+#define offsetof(st, m) \
+    ((size_t)&(((st *)0)->m))
 #endif

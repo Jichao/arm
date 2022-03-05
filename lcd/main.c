@@ -22,9 +22,10 @@ void clock_init(void)
 }
 
 int main(void)
-{  
-    // clock_init();
-    // ram_init();
+{
+    /*  
+    clock_init();
+    ram_init();*/
     bss_zero();
     entry();
     return 0;

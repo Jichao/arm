@@ -14,7 +14,8 @@
 #define EM63_TRP_NS 18
 #define TTB 0x30100000
 
-extern int _bss_start, _bss_end;
+extern char _bss_start;
+extern char _bss_end;
 
 void enable_sdram(void)
 {
@@ -97,15 +98,13 @@ void enable_mmu_and_cache(void)
         "ldr r1, =0x100f\n"
         "orr r0, r1\n"
         "mcr p15,0,r0,c1,c0,0\n" //enable mmu
-        :
-        :
     );
 }
 
 void bss_zero(void)
 {
-    int *p = &_bss_start;
-    for (; p < &_bss_end; ++p) {
+    int *p = (int*)&_bss_start;
+    for (; p < (int*)&_bss_end; ++p) {
         *p = 0;
     }
 }
