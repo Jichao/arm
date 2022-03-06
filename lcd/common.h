@@ -53,8 +53,10 @@ typedef char int8_t;
 
 #define UDEBUG 0
 
-#define dprint(...) \
+#define dprintk(...) \
     if (UDEBUG == 1) \
-        printf(__VA_ARGS); \
+        printf(__VA_ARGS__); \
+
+extern uint32_t jround(uint32_t value, uint32_t align, BOOL up); 
 
 #endif
