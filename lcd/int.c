@@ -68,6 +68,7 @@ static BOOL is_valid_interval(int index, int interval)
 void irq_handler(void)
 {
     uint32_t off = INTOFFSET;
+
     if (off == EINT8_23_OFF) {
         handle_led(8, 0);
         handle_led(11, 1);

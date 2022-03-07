@@ -114,6 +114,9 @@
 #define TCNTB0 (*(volatile uint32_t*)0x5100000C)
 #define TCMPB0 (*(volatile uint32_t*)0x51000010)
 
+#define TCNTB2 (*(volatile uint32_t*)0x51000024)
+#define TCMPB2 (*(volatile uint32_t*)0x51000028)
+#define TCNTO2 (*(volatile uint32_t*)0x5100002C)
 
 //gpio related
 #define GPB5_OUT (1<<10)

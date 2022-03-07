@@ -51,7 +51,7 @@ typedef char int8_t;
         printf(__VA_ARGS__); \
     }
 
-#define UDEBUG 0
+#define UDEBUG 1
 
 #define dprintk(...) \
     if (UDEBUG == 1) \

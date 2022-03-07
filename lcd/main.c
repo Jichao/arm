@@ -23,11 +23,21 @@ void clock_init(void)
     MPLLCON = (0x7f << 12 | 2 << 4 | 1);
 }
 
+void disable_alignment_check(void)
+{
+    __asm__("mrc p15,0,r0,c1,c0,0\n"
+            "mvn r1, #2\n"
+            "and r0, r0, r1\n"
+            "mcr p15,0,r0,c1,c0,0\n" // enable mmu
+    );
+}
+
 int main(void)
 {
     /*  
     clock_init();
     ram_init();*/
+    disable_alignment_check();
     bss_zero();
     entry();
     return 0;

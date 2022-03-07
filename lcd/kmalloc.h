@@ -4,7 +4,6 @@
 #define SECTION_SIZE (1<<20)
 
 #include "bits.h"
-#include "list.h"
 #include "freelist.h"
 typedef struct s_meminfo {
     uint32_t heap_start;

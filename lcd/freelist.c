@@ -74,6 +74,7 @@ freelist_entry_t *new_sub_entry(freelist_entry_t *freelist, int size)
         freelist_entry_t *sub_entry = get_next_entry(freelist, kEntryType_Phy);
         sub_entry->len = size;
         set_entry_free(sub_entry, FALSE);
+        return sub_entry;
     }
     else {
         return NULL;

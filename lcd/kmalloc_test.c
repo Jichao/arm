@@ -3,6 +3,9 @@
 #include "kmalloc.h"
 #include <assert.h>
 #include <time.h> 
+#include <stdlib.h>
+#include "apple_wav.h"
+#include "wav.h"
 
 static void* get_ptr(int index) {
     return (void*)(_meminfo->heap_start + (index + 4) * SECTION_SIZE);
@@ -88,16 +91,23 @@ void test_for_loop_malloc()
     }
 }
 
+void test_read_wav_file()
+{
+    wav_format_t *wav = read_wav_file(apple_wav_file, 1764098);
+    assert(wav);
+}
+
 int main(void)
 {
     printf("start initing...\n");
     kmalloc_init();
     printf("start testing...\n");
     srand((unsigned)time(NULL)); 
-    test_bits();
+    test_read_wav_file();
     //test_cont_malloc();
-    test_cont_malloc2();
-    test_for_loop_malloc();
+    // test_bits();
+    // test_cont_malloc2();
+    // test_for_loop_malloc();
     printf("end testing...\n");
     return 0;
 }
