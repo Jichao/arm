@@ -37,7 +37,9 @@ int main(void)
     /*  
     clock_init();
     ram_init();*/
-    disable_alignment_check();
+
+    //如果disable alignment check只是不会data abort而已，但是结果会更严重因为这个时候数据可能是算的。
+    //disable_alignment_check();
     bss_zero();
     entry();
     return 0;

@@ -6,6 +6,7 @@
 #include <string.h>
 #endif
 
+#pragma pack(push)
 #pragma pack(2)
 typedef struct tag_format_chunk {
     char id[4];
@@ -17,6 +18,7 @@ typedef struct tag_format_chunk {
     uint16_t block_align;
     uint16_t bits_per_sample;
 } format_chunk_t;
+#pragma pack(pop)
 
 wav_format_t *read_wav_file(const char *buffer, int len)
 {
@@ -47,6 +49,7 @@ wav_format_t *read_wav_file(const char *buffer, int len)
             wav->avg_bytes_per_sec = chunk->avg_bytes;
             printf("wav header set good\r\n");
             printf("chunk size ptr = %p\r\n", next_chunk + 4);
+            //wav->data_len = *(uint32_t*)(next_chunk + 4);
             wav->data_len = buff_to_u32(next_chunk + 4);
             wav->data = (char*)(next_chunk + 8);
             return wav;
