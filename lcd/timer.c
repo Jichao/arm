@@ -1,12 +1,6 @@
 #include "timer.h"
 #include "clock.h"
 
-#define TCFG0 (*(volatile uint32_t*)0x51000000)
-#define TCFG1 (*(volatile uint32_t*)0x51000004)
-#define TCON (*(volatile uint32_t*)0x51000008)
-#define TCNTB0 (*(volatile uint32_t*)0x5100000C)
-#define TCMPB0 (*(volatile uint32_t*)0x51000010)
-
 volatile timeout_callback_t timer0_callback = 0;
 
 void handle_timer0_interrupt()

@@ -3,23 +3,6 @@
 #include "timer.h"
 #include "clock.h"
 
-#define NFCONF (*(volatile uint32_t*)0x4E000000)
-#define NFCONT (*(volatile uint32_t*)0x4E000004)
-#define NFCMMD (*(volatile uint8_t*)0x4E000008)
-#define NFADDR (*(volatile uint8_t*)0x4E00000C)
-#define NFDATA (*(volatile uint8_t*)0x4E000010)
-
-#define NFMECCD0 (*(volatile uint32_t*)0x4E000014)
-#define NFMECCD1 (*(volatile uint32_t*)0x4E000018)
-#define NFSECCD (*(volatile uint32_t*)0x4E00001c)
-#define NFSTAT (*(volatile uint8_t*)0x4E000020)
-#define NFESTAT0 (*(volatile uint32_t*)0x4E000024)
-#define NFESTAT1 (*(volatile uint32_t*)0x4E000028)
-#define NFMECC0 (*(volatile uint32_t*)0x4E00002c)
-#define NFMECC1 (*(volatile uint32_t*)0x4E000030)
-#define NFSBLK (*(volatile uint32_t*)0x4E000034)
-#define NFEBLK (*(volatile uint32_t*)0x4E000038)
-
 #define NAND_PAGE_SIZE 2048
 #define NAND_PAGE_ADDR_MASK (NAND_PAGE_SIZE - 1)
 

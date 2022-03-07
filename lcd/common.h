@@ -58,5 +58,8 @@ typedef char int8_t;
         printf(__VA_ARGS__); \
 
 extern uint32_t jround(uint32_t value, uint32_t align, BOOL up); 
+#define jcountof(var) (sizeof(var) / sizeof(var[0]))
+
+#include "2440addr.h"
 
 #endif

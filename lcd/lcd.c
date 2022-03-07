@@ -3,26 +3,6 @@
 #include "clock.h"
 #include "kmalloc.h"
 
-#define GPCCON (*(volatile uint32_t*)0x56000020)
-#define GPCUP (*(volatile uint32_t*)0x56000028)
-#define GPDCON (*(volatile uint32_t*)0x56000030)
-#define GPDUP (*(volatile uint32_t*)0x56000038)
-#define GPGCON (*(volatile uint32_t*)0x56000060)
-#define GPGUP (*(volatile uint32_t*)0x56000068)
-
-#define LCDCON1 (*(volatile uint32_t*)0X4D000000)
-#define LCDCON2 (*(volatile uint32_t*)0X4D000004)
-#define LCDCON3 (*(volatile uint32_t*)0X4D000008)
-#define LCDCON4 (*(volatile uint32_t*)0X4D00000c)
-#define LCDCON5 (*(volatile uint32_t*)0X4D000010)
-#define LCDSADDR1 (*(volatile uint32_t*)0X4D000014)
-#define LCDSADDR2 (*(volatile uint32_t*)0X4D000018)
-#define LCDSADDR3 (*(volatile uint32_t*)0X4D00001c)
-#define TPAL (*(volatile uint32_t*)0X4D000050)
-#define LCDINTMSK  (*(volatile unsigned *)0x4d00005c)	//LCD Interrupt mask
-#define TCONSEL     (*(volatile unsigned *)0x4d000060)	//LPC3600 Control --- edited by junon
-#define PALETTE     0x4d000400
-
 #define TD35_VCLK 7.1
 #define TD35_VBPD 0
 #define TD35_VFPD 0

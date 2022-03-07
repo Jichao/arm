@@ -3,9 +3,6 @@
 
 #include "common.h"
 
-#define CLKDIV (*(volatile uint32_t*)0x4c000014)
-#define MPLLCON (*(volatile uint32_t*)0x4c000004)
-#define CAMDIVN (*(volatile uint32_t*)0x4c000018)
 #define FIN_FREQ 12
 
 void clock_init(void);

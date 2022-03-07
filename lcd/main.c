@@ -17,7 +17,9 @@ void clock_init(void)
         "orr r0, r0, #0xc0000000\n"
         "mcr p15,0,r0,c1,c0,0\n"
     );
-    CLKDIV = 0x7; //fclk:hclk:pclk = 6:2:1
+    //fclk:hclk:pclk = 6:2:1
+    // 405:135:67.5
+    CLKDIV = 0x7; 
     MPLLCON = (0x7f << 12 | 2 << 4 | 1);
 }
 

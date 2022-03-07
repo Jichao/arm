@@ -2,18 +2,6 @@
 #include "uart.h"
 #include "clock.h"
 
-#define GPHCON (*(volatile uint32_t*)0x56000070)
-#define GPHUP (*(volatile uint32_t*)0x56000078)
-#define ULCON0 (*(volatile uint32_t*)0x50000000)
-#define UCON0 (*(volatile uint32_t*)0x50000004)
-#define UFCON0 (*(volatile uint32_t*)0x50000008)
-#define UMCON0 (*(volatile uint32_t*)0x5000000c)
-#define UTRSTAT0 (*(volatile uint32_t*)0x50000010)
-#define UMSTAT0 (*(volatile uint32_t*)0x5000001C)
-#define UBRDIV0 (*(volatile uint32_t*)0x50000028)
-#define UTXH0 (*(volatile uint8_t*)0x50000020)
-#define URXH0 (*(volatile uint8_t*)0x50000024)
-
 //init uart0
 void uart_init(int baudrate)
 {

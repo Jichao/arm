@@ -2,13 +2,6 @@
 #include "common.h"
 #include "clock.h"
 
-#define BWSCON (*(volatile uint32_t*)0x48000000)
-#define BANKCON6 (*(volatile uint32_t*)0x4800001C)
-#define REFRESH (*(volatile uint32_t*)0x48000024)
-#define BANKSIZE (*(volatile uint32_t*)0x48000028)
-#define MRSRB6 (*(volatile uint32_t*)0x4800002C)
-
-#define SDRAM_BASE 0x30000000
 #define EM63_TRCD_NS 20
 #define EM63_TRC_NS 60
 #define EM63_TRP_NS 18

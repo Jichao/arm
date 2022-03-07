@@ -6,16 +6,6 @@
 
 extern uint32_t _irq;
 
-#define SRCPND (*(volatile uint32_t*)0x4A000000)
-#define INTMOD (*(volatile uint32_t*)0x4A000004)
-#define INTMSK (*(volatile uint32_t*)0x4A000008)
-#define PRIORITY (*(volatile uint32_t*)0x4A00000c)
-#define INTPND (*(volatile uint32_t*)0x4A000010)
-#define INTOFFSET (*(volatile uint32_t*)0x4A000014)
-
-#define EINTMASK (*(volatile uint32_t*)0x560000a4)
-#define EINTPEND (*(volatile uint32_t*)0x560000a8)
-
 #define EINT8_23_OFF 5
 #define INT_TIMER0_OFF 10
 
