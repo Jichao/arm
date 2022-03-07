@@ -60,6 +60,8 @@ typedef char int8_t;
 extern uint32_t jround(uint32_t value, uint32_t align, BOOL up); 
 #define jcountof(var) (sizeof(var) / sizeof(var[0]))
 
+uint32_t buff_to_u32(unsigned char* buff);
+
 #include "2440addr.h"
 
 #endif

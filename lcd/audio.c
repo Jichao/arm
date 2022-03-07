@@ -167,6 +167,8 @@ int start_play_audio(wav_format_t* wav)
     init_1314();
     init_iis(wav->sample_rate, wav->bits_per_sample, wav->channels);
 
+    printf("wav data len = %d\r\n", wav->data_len);
+
     IISCON |= 1;
     for (int i = 0; i < wav->data_len; i += 64) {
         while (IISCON & (1 << 7));

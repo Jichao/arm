@@ -46,13 +46,13 @@ wav_format_t *read_wav_file(const char *buffer, int len)
             wav->block_align = chunk->block_align;
             wav->avg_bytes_per_sec = chunk->avg_bytes;
             printf("wav header set good\r\n");
-            printf("next_chunk ptr = %p\r\n", next_chunk + 4);
-            wav->data_len = *(uint32_t *)(next_chunk + 4);
+            printf("chunk size ptr = %p\r\n", next_chunk + 4);
+            wav->data_len = buff_to_u32(next_chunk + 4);
             wav->data = (char*)(next_chunk + 8);
             return wav;
         }
         else {
-            next_chunk += *(uint32_t *)(next_chunk + 4) + 8;
+            next_chunk += buff_to_u32(next_chunk + 4) + 8;
         }
     }
     printf("invalid format 3\r\n");
