@@ -4,6 +4,6 @@
 *.dis
 *.swp
 *.a
+*.out 
 *dsym*
-lcd/kmalloc_test
-tools/a.out
+build/*
