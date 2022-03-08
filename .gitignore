@@ -6,3 +6,4 @@
 *.a
 *dsym*
 lcd/kmalloc_test
+tools/a.out
