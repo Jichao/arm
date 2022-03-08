@@ -1,0 +1,22 @@
+CFLAGS 	:= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -ffreestanding -I../include
+AR := arm-linux-ar 
+CC := arm-linux-gcc
+
+C_SOURCES := $(shell find . -mindepth 1 -maxdepth 1 -name '*.c' ! -name 'minimad.c' | sed -r 's/^\.\///')
+ASM_SOURCES := $(shell find . -mindepth 1 -maxdepth 1 -name '*.S' | sed -r 's/^\.\///')
+SOURCES := $(C_SOURCES) $(ASM_SOURCES)
+
+OBJECTS := $(patsubst %.c, %.o, $(SOURCES))
+OBJECTS := $(patsubst %.S, %.o, $(OBJECTS))
+
+libmad.a: $(OBJECTS)
+	${AR} -r -o $@ $^
+	
+%.o:%.c
+	${CC} $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+%.o:%.S
+	${CC} $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f *.a *.o		

@@ -51,7 +51,7 @@ typedef char int8_t;
         printf(__VA_ARGS__); \
     }
 
-#define UDEBUG 1
+#define UDEBUG 0
 
 #define dprintk(...) \
     if (UDEBUG == 1) \
@@ -64,5 +64,7 @@ int roundf(float a);
 uint32_t buff_to_u32(unsigned char* buff);
 
 #include "2440addr.h"
+
+extern void abort(void);
 
 #endif

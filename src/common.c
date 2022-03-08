@@ -25,3 +25,9 @@ uint32_t buff_to_u32(unsigned char* buff)
 {
     return buff[0] + (buff[1] << 8) + (buff[2] << 16) + (buff[3] << 24);
 }
+
+
+void abort(void)
+{
+    printf("!!!!abort\r\n");
+}

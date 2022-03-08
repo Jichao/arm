@@ -3,6 +3,7 @@
 #include "kmalloc.h"
 #include "led.h"
 #include "int.h"
+#include "mp3.h"
 #include "timer.h"
 #include "common.h"
 #include "uart.h"
@@ -47,7 +48,7 @@ void test_lcd(void)
     lcd_uninit();
 }
 
-void test_audio(void)
+void play_wav(void)
 {
     wav_format_t* wav = read_wav_file(apple_wav_file, 1764098);
     if (!wav) {
@@ -56,6 +57,13 @@ void test_audio(void)
     }
     start_play_audio(wav);
     kfree(wav);
+}
+
+void play_mp3(void)
+{
+    printf("start play mp3...\r\n");
+    start_play_mp3(apple_mp3, apple_mp3_size());
+    printf("end play mp3...\r\n");
 }
 
 void entry(void)
@@ -78,13 +86,22 @@ void entry(void)
     while (1) {
         printf("function menu \r\n");
         printf("  1. lcd test\r\n");
-        printf("  2. music test\r\n");
+        printf("  2. play wav test\r\n");
+        printf("  3. play mp3 test\r\n");
         char choice = getc();
-        if (choice == '1') {
-            test_lcd();
-        }
-        else if (choice == '2') {
-            test_audio();
-        }
+        int c = choice - '0';
+        switch (c) {
+            case 1:
+                test_lcd();
+                break;
+            case 2:
+                play_wav();
+                break;
+            case 3:
+                play_mp3();
+                break;
+            default:
+                break;
+        };
     }
 }

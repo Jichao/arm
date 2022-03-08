@@ -98,7 +98,7 @@ freelist_entry_t *get_free_entry(freelist_entry_t *entry, int size,
 void *fmalloc(freelist_man_t *man, int size)
 {
     kassert(man, "invalid man");
-    kassert((size > 16 && size < ((4 << 20) - sizeof(freelist_entry_t))), "invalid size");
+    //kassert((size > 16 && size < ((4 << 20) - sizeof(freelist_entry_t))), "invalid size");
 
     size = jround(size, 4, TRUE);
     freelist_entry_t *prev = NULL;

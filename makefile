@@ -3,7 +3,11 @@ OBJCOPY := arm-linux-objcopy
 OBJDUMP := arm-linux-objdump
 
 GCC_LIB_DIR := /home/book/FriendlyARM/toolschain/4.4.3/lib/gcc/arm-none-linux-gnueabi/4.4.3
-CFLAGS 	:= -nostdinc -fno-builtin -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -ffreestanding -std=c99 -Ilib/libc/include
+
+CFLAGS 	:= -nostdinc -fno-builtin -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \
+	-ffreestanding -std=c99 \
+	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++
+
 LD := arm-linux-ld
 LDFLAGS := -lgcc -L$(GCC_LIB_DIR)
 
@@ -16,7 +20,7 @@ C_SOURCES := $(shell find $(SOURCE_DIR) -name '*.c')
 ASM_SOURCES := $(shell find $(SOURCE_DIR) -name '*.S')
 SOURCES := $(C_SOURCES) $(ASM_SOURCES)
 C_LIB := lib/libc/libc.a
-MP3_LIB := 3rd/libmad
+MP3_LIB := 3rd/libmad-0.15.1b/libmad.a
 
 OBJECTS := $(patsubst $(SOURCE_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
 OBJECTS := $(patsubst $(SOURCE_DIR)/%.S, $(BUILD_DIR)/%.o, $(OBJECTS))
@@ -26,16 +30,20 @@ ELF := $(BUILD_DIR)/$(NAME).elf
 BINARY := $(patsubst %.elf, %.bin, $(ELF))
 DISASSM := $(patsubst %.elf, %.dis, $(ELF))
 
-.PHONY: all clean test setup
+.PHONY: all clean test setup libs
 
-all: setup $(BINARY)
+all: setup libs $(BINARY)
+
+libs:
+	cd lib/libc/src; make; cd ../../;
+	cd 3rd/libmad-0.15.1b; make -f makefile.arm; cd ../../;
 
 setup: build
 
 build:
 	mkdir -p build
 
-$(BINARY): $(OBJECTS) $(C_LIB)
+$(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(LD) -T$(NAME).lds -o $(ELF) $^ $(LDFLAGS)
 	$(OBJCOPY) -O binary -S $(ELF) $(BINARY)
 	$(OBJDUMP) -D -m arm $(ELF) > $(DISASSM)
@@ -45,9 +53,6 @@ $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.S
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.c
 	arm-linux-gcc $(CFLAGS) -c $^ -o $@
-
-$(C_LIB):
-	cd lib/libc/src; make; cd ../../;
 
 clean:
 	rm -rf build

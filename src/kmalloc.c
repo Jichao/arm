@@ -60,7 +60,7 @@ void kmalloc_init(void)
 
 void* kmalloc(int size)
 {
-    dprintk("kmalloc size = %d\n", size);
+    dprintk("kmalloc size = %d\r\n", size);
     //use bitmap allocation
     if (size >= SECTION_SIZE) {
         uint32_t len = round_section(size, TRUE) / SECTION_SIZE;
@@ -94,7 +94,7 @@ void* kmalloc(int size)
 void kfree(void* ptr)
 {
     _memerr = 0;
-    dprintk("kfree %p\n", ptr);
+    dprintk("kfree %p\r\n", ptr);
     if ((uint32_t)ptr % SECTION_SIZE == 0) {
         int index = get_section_index((uint32_t)ptr);
         int len = _meminfo->section_len[index];
