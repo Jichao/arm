@@ -4,12 +4,15 @@
 #include "mad.h"
 #include "kmalloc.h"
 #include "mp3.h"
+#include "timer.h"
 
 #define WAVE_FORMAT_PCM 0x0001
 #define L3M (1 << 2) // GPB2 = L3MODE
 #define L3D (1 << 3) // GPB3 = L3DATA
 #define L3C (1 << 4) // GPB4 = L3CLOCK
 #define STATUS_ADDR (0x14 + 2)
+
+BOOL mp3_direct = 0;
 
 typedef void (*play_func_t)(uint8_t* data);
 typedef struct tag_pcm_buffer {
@@ -18,6 +21,9 @@ typedef struct tag_pcm_buffer {
     uint32_t ptr;
     play_func_t play_callback;
 } pcm_buffer;
+
+uint32_t avg_int = 0;
+uint32_t last_tick = 0;
 
 void play_pcm(uint8_t *data)
 {
@@ -178,7 +184,6 @@ int verify_wav_format(wav_format_t *wav)
 
 enum mad_flow header_callback(void *data, struct mad_header const *header)
 {
-    return MAD_FLOW_CONTINUE;
     if (!is_freq_ok(header->samplerate)) {
         printf("mp3 invalid sample rate\r\n");
         return MAD_FLOW_STOP;
@@ -213,10 +218,11 @@ void pcm_add_sample(pcm_buffer* pb, uint8_t v)
     }
     pb->buf[pb->ptr] = v;
     pb->ptr++;
-    // if (pb->ptr == 64) {
-    //     pb->play_callback(pb->buf);
-    //     pb->ptr = 0;
-    // }
+
+    if (mp3_direct && pb->ptr == 64) {
+        pb->play_callback(pb->buf);
+        pb->ptr = 0;
+    }
 }
 
 pcm_buffer* _pcm;
@@ -225,6 +231,18 @@ static enum mad_flow output_callback(void *data,
                                      struct mad_header const *header,
                                      struct mad_pcm *pcm)
 {
+    uint32_t tick = get_tick_count();
+    if (last_tick) {
+        uint32_t interval = tick - last_tick;
+        if (avg_int == 0) {
+            avg_int = interval;
+        }
+        else {
+            avg_int = (avg_int + interval) >> 1;
+        }
+        last_tick = tick;
+    }
+
     //printf("output callback called\r\n");
     unsigned int nchannels, nsamples;
     mad_fixed_t const *left_ch, *right_ch;
@@ -271,36 +289,73 @@ void free_pcm_buffer(pcm_buffer* pcm) {
     kfree(pcm);
 }
 
-
-int start_play_mp3(unsigned char *buff, int size)
+int play_mp3_async(unsigned char *buff, int size)
 {
-    printf("start play mp3 audio, buffer = %p, size = %d\r\n", buff, size);
-    
+    printf("ASYNC start play mp3 audio, buffer = %p, size = %d\r\n", buff, size);
     _pcm = create_pcm_buffer(2 << 20);
-
-    printf("decoding mp3....\r\n");
-   
-    decode_mp3(buff, size, 0, output_callback, 0);
-
-    printf("decode mp3 done....\r\n");
 
     init_1314();
     // todo: remove hard code
     init_iis(44100, 16, 2);
-
     IISCON |= 1;
+    uint32_t tick = get_tick_count();
+    decode_mp3(buff, size, 0, output_callback, 0);
+    uint32_t interval  = get_tick_count() - tick;
+
+    IISCON &= ~1;
+    free_pcm_buffer(_pcm);
+    printf("end play mp3 audio output avg_tick = %d whole time = %d\r\n", avg_int, interval);
+    return 0;
+}
+
+int play_mp3_sync(unsigned char *buff, int size)
+{
+    uint32_t xx_tick, xx_interval;
+    printf("SYNC start play mp3 audio, buffer = %p, size = %d\r\n", buff, size);
+    _pcm = create_pcm_buffer(2 << 20);
+
+    printf("decoding mp3....\r\n");
+    xx_tick = get_tick_count();
+    decode_mp3(buff, size, 0, output_callback, 0);
+    xx_interval  = get_tick_count() - xx_tick;
+    printf("decode mp3 done tick count = %d....\r\n", xx_interval);
+
+    init_1314();
+    // todo: remove hard code
+    init_iis(44100, 16, 2);
+    IISCON |= 1;
+
+    xx_tick = get_tick_count();
     for (int i = 0; i < _pcm->ptr; i += 64) {
-        while (IISCON & (1 << 7)) ;
+        uint32_t t = get_tick_count();
+        while (IISCON & (1 << 7))
+            ;
         for (int j = 0; j < 32; ++j) {
             IISFIFO = _pcm->buf[i + 2 * j] + (_pcm->buf[i + 2 * j + 1] << 8);
         }
+        uint32_t interval = get_tick_count() - t;
+        if (avg_int == 0) {
+            avg_int = interval;
+        }
+        else {
+            avg_int = (avg_int + interval) >> 1;
+        }
     }
+    xx_interval  = get_tick_count() - xx_tick;
     IISCON &= ~1;
-
     free_pcm_buffer(_pcm);
-
-    printf("end play mp3 audio\r\n");
+    printf("end play mp3 audio play avg feed interval %d whole time = %d\r\n", avg_int, xx_interval);
     return 0;
+}
+
+
+int start_play_mp3(unsigned char *buff, int size, BOOL direct)
+{
+    mp3_direct = direct;
+    if (mp3_direct)
+        return play_mp3_async(buff, size);
+    else 
+        return play_mp3_sync(buff, size);
 }
 
 int start_play_audio(wav_format_t *wav)
@@ -324,6 +379,10 @@ int start_play_audio(wav_format_t *wav)
         for (int j = 0; j < 32; ++j) {
             IISFIFO = wav->data[i + 2 * j] + (wav->data[i + 2 * j + 1] << 8);
         }
+        /*
+        for (int j = 0; j < 20; j++)
+            for (int i = 0; i < 30000000; ++i);*/
+        // delay_ns(30000000);
     }
     IISCON &= ~1;
     printf("play audio done\r\n");

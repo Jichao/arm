@@ -1,26 +1,23 @@
 #include "entry.h"
-#include "clock.h"
-#include "kmalloc.h"
-#include "led.h"
-#include "int.h"
-#include "mp3.h"
-#include "timer.h"
-#include "common.h"
-#include "uart.h"
-#include "stdio.h"
-#include "lcd.h"
-#include "girl.h"
-#include "audio.h"
-#include "wav.h"
 #include "apple_wav.h"
+#include "audio.h"
+#include "clock.h"
+#include "common.h"
+#include "girl.h"
+#include "int.h"
+#include "kmalloc.h"
+#include "lcd.h"
+#include "led.h"
+#include "mp3.h"
+#include "stdio.h"
+#include "timer.h"
+#include "uart.h"
+#include "wav.h"
 
 extern char _ram_start;
 extern char _bss_end;
 
-void on_timer(void)
-{
-    invert_led(0);
-}
+void on_timer(void) { invert_led(0); }
 
 void test_lcd(void)
 {
@@ -50,26 +47,26 @@ void test_lcd(void)
 
 void play_wav(void)
 {
-    wav_format_t* wav = read_wav_file(apple_wav_file, 1764098);
+    wav_format_t *wav = read_wav_file(apple_wav_file, 1764098);
     if (!wav) {
         printf("read wav file failed\r\n");
-        return ;
+        return;
     }
     start_play_audio(wav);
     kfree(wav);
 }
 
-void play_mp3(void)
+void play_mp3(BOOL direct)
 {
     printf("start play mp3...\r\n");
-    start_play_mp3(apple_mp3, apple_mp3_size());
+    start_play_mp3(apple_mp3, apple_mp3_size(), direct);
     printf("end play mp3...\r\n");
 }
 
 void entry(void)
 {
-    printf("bbs end %p ram start %p rom size %x\r\n",
-        &_bss_end, &_ram_start, ((int)&_bss_end - (int)&_ram_start));
+    printf("bbs end %p ram start %p rom size %x\r\n", &_bss_end, &_ram_start,
+           ((int)&_bss_end - (int)&_ram_start));
     kmalloc_init();
 
     printf("led inited\r\n");
@@ -80,28 +77,34 @@ void entry(void)
     interrupt_init();
     printf("interupt inited\r\n");
 
-    set_timer0(2*1000, TRUE, &on_timer);
+    set_timer0(1, TRUE, &on_timer);
     printf("timer0 inited\r\n");
 
     while (1) {
-        printf("function menu \r\n");
+        printf("  ***function menu*** \r\n");
+        printf("  current tick count = %u\r\n", get_tick_count());
         printf("  1. lcd test\r\n");
         printf("  2. play wav test\r\n");
-        printf("  3. play mp3 test\r\n");
+        printf("  3. play mp3 sync test\r\n");
+        printf("  4. play mp3 async test\r\n");
+
         char choice = getc();
         int c = choice - '0';
         switch (c) {
-            case 1:
-                test_lcd();
-                break;
-            case 2:
-                play_wav();
-                break;
-            case 3:
-                play_mp3();
-                break;
-            default:
-                break;
+        case 1:
+            test_lcd();
+            break;
+        case 2:
+            play_wav();
+            break;
+        case 3:
+            play_mp3(FALSE);
+            break;
+        case 4:
+            play_mp3(TRUE);
+            break;
+        default:
+            break;
         };
     }
 }

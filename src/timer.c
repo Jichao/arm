@@ -3,10 +3,13 @@
 
 volatile timeout_callback_t timer0_callback = 0;
 
+volatile uint32_t _tick = 0;
+
 void handle_timer0_interrupt()
 {
-    if (timer0_callback)
-        timer0_callback();
+    _tick++;
+    // if (timer0_callback)
+    //     timer0_callback();
 }
 
 void disable_timer(int index)
@@ -68,7 +71,7 @@ void delay_ns(uint32_t ns)
         ns = min_unit;
     }
     int count = ns / min_unit;
-    printf("delay %u ns unit: %d ns count = %d\r\n", ns, min_unit, count);
+    // printf("delay %u ns unit: %d ns count = %d\r\n", ns, min_unit, count);
 
     TCNTB2 = count;
     TCMPB2 = 0;
@@ -79,9 +82,14 @@ void delay_ns(uint32_t ns)
     //one short && start for timer2
     TCON = (TCON & ~(0xf << 12)) | (0x1 << 12);
     while (TCNTO2) {
-        printf("count = %u\r\n", TCNTO2);
+        // printf("count = %u\r\n", TCNTO2);
     };
 
     //stop timer2?
     TCON = TCON & ~(0x1 << 12);
+}
+
+uint32_t get_tick_count(void)
+{
+    return _tick;
 }
