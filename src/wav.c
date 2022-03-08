@@ -50,12 +50,12 @@ wav_format_t *read_wav_file(const char *buffer, int len)
             printf("wav header set good\r\n");
             printf("chunk size ptr = %p\r\n", next_chunk + 4);
             //wav->data_len = *(uint32_t*)(next_chunk + 4);
-            wav->data_len = buff_to_u32(next_chunk + 4);
+            wav->data_len = buff_to_u32((uint8_t*)next_chunk + 4);
             wav->data = (char*)(next_chunk + 8);
             return wav;
         }
         else {
-            next_chunk += buff_to_u32(next_chunk + 4) + 8;
+            next_chunk += buff_to_u32((uint8_t*)next_chunk + 4) + 8;
         }
     }
     printf("invalid format 3\r\n");
