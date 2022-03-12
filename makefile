@@ -19,7 +19,7 @@ TEST_DIR := test
 C_SOURCES := $(shell find $(SOURCE_DIR) -name '*.c')
 ASM_SOURCES := $(shell find $(SOURCE_DIR) -name '*.S')
 SOURCES := $(C_SOURCES) $(ASM_SOURCES)
-C_LIB := lib/libc/libc.a
+C_LIB := lib/libc/src/libc.a
 MP3_LIB := 3rd/libmad-0.15.1b/libmad.a
 
 OBJECTS := $(patsubst $(SOURCE_DIR)/%.c, $(BUILD_DIR)/%.o, $(SOURCES))
@@ -56,6 +56,8 @@ $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.c
 
 clean:
 	rm -rf build
+	rm $(C_LIB)
+	rm $(MP3_LIB)
 
 test: kmalloc_test
 	./kmalloc_test 

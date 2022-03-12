@@ -119,7 +119,9 @@
 /* Version number of package */
 #define VERSION "0.15.1b"
 
-#define FPM_DEFAULT
+#define FPM_ARM
+
+#define OPT_SPEED
 
 extern void abort(void);
 

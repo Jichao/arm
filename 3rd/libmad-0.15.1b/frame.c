@@ -471,7 +471,7 @@ int mad_frame_decode(struct mad_frame *frame, struct mad_stream *stream)
     return 0;
 
 fail:
-    printf("frame decode failed\r\n");
+    // printf("frame decode failed\r\n");
     stream->anc_bitlen = 0;
     return -1;
 }
