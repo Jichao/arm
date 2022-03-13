@@ -1,10 +1,10 @@
 #include "led.h"
 #include "common.h"
 
-static void wait(volatile uint32_t dly)
+/*static void wait(volatile uint32_t dly)
 {
 	for(; dly > 0; dly--);
-}
+}*/
 
 static void update_led(int gpb)
 {

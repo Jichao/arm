@@ -1,6 +1,7 @@
 #include "wav.h"
 #include "common.h"
 #include "kmalloc.h"
+#include "../lib/libc/src/string.h"
 
 #ifdef TEST
 #include <string.h>

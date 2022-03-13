@@ -60,6 +60,9 @@ void kmalloc_init(void)
 
 void* kmalloc(int size)
 {
+    if (size == 0) {
+        return NULL;
+    }
     dprintk("kmalloc size = %d\r\n", size);
     //use bitmap allocation
     if (size >= SECTION_SIZE) {
@@ -113,4 +116,10 @@ void * kcalloc(uint32_t items, uint32_t count)
     void* ptr = kmalloc(items * count);
     zero(ptr, items * count);
     return ptr;
+}
+
+
+void* krealloc(void* ptr, int new_size)
+{
+    return frealloc(&_meminfo->free_man, ptr, new_size);   
 }

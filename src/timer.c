@@ -1,70 +1,117 @@
 #include "timer.h"
+#include "base/heap.h"
+#include "kmalloc.h"
 #include "clock.h"
 
-volatile timeout_callback_t timer0_callback = 0;
-
 volatile uint32_t _tick = 0;
+
+heap_t *_timer_queue;
+
+int compare_timer(heap_element_t a, heap_element_t b)
+{
+    ktimer_t *ta = (ktimer_t *)a;
+    ktimer_t *tb = (ktimer_t *)b;
+    if (ta->tick == tb->tick) {
+        return 0;
+    }
+    else if (ta->tick > tb->tick) {
+        return 1;
+    }
+    else {
+        return -1;
+    }
+}
+
+void init_timer()
+{
+    // minimum interval:
+    //   pclk/{prescaler+1}/divider
+    //   (400/3./2.)/256/16 = 0.016MHz
+    //   1/0.016=61.44us
+    // for timer0
+    TCFG0 = TCFG0 | 0xff;         // prescaler 255
+    TCFG1 = (TCFG1 & ~0xf) | 0x3; // divider 16
+
+    // set the count
+    // 1ms one tick
+    TCNTB0 = 1 * 1000 * (get_pclk() / 256. / 16);
+    TCMPB0 = 0;
+
+    // manual load count
+    TCON |= (1 << 1);
+    // auto reload (repeated) | start for timer0
+    TCON = 0x9;
+
+    _timer_queue = heap_create(kMin_heap, 0, &compare_timer, NULL, 0);
+}
+
+void dispatch_timer(void)
+{
+    ktimer_t *timer;
+    while (TRUE) {
+        timer = (ktimer_t *)heap_top(_timer_queue);
+        if (!timer) {
+            break;
+        }
+
+        if (timer->state == kTimer_Cancelled) {
+            heap_pop(_timer_queue);
+        }
+        else {
+            if (timer->tick >= _tick) {
+                heap_pop(_timer_queue);
+                if (timer->repeat) {
+                    timer->tick += timer->interval;
+                    timer->state = kTimer_FiredOnce;
+                }
+                else {
+                    timer->state = kTimer_Done;
+                }
+                if (timer->callback) {
+                    timer->callback(timer->cb);
+                }
+            }
+            else {
+                break;
+            }
+        }
+    };
+}
 
 void handle_timer0_interrupt()
 {
     _tick++;
-    // if (timer0_callback)
-    //     timer0_callback();
+    dispatch_timer();
 }
 
 void disable_timer(int index)
 {
     if (index == 0) {
         TCON &= ~1;
-    } 
+    }
     if (index == 2) {
         TCON &= ~(1 << 8);
     }
     if (index == 3) {
         TCON &= ~(1 << 12);
-    } 
+    }
     if (index == 4) {
         TCON &= ~(1 << 20);
     }
     if (index == -1) {
-        TCON &= ~1 & ~(1<<8) & ~(1<<12) & ~(1<<20);
+        TCON &= ~1 & ~(1 << 8) & ~(1 << 12) & ~(1 << 20);
     }
 }
 
-void set_timer0(uint32_t ms, int repeat, timeout_callback_t callback)
-{
-    if (callback == 0) {
-        return;
-    }
-    timer0_callback = callback; 
-
-    //minimum interval:
-    //  pclk/{prescaler+1}/divider
-    //  (400/3./2.)/256/16 = 0.016MHz
-    //  1/0.016=61.44us
-    //for timer0
-    TCFG0 = TCFG0 | 0xff; //prescaler 255
-    TCFG1 = (TCFG1 & ~0xf) | 0x3;    //divider 16
-
-    //set the count
-    TCNTB0 = ms * 1000 * (get_pclk() / 256. / 16);
-    TCMPB0 = 0;
-
-    //manual load count
-    TCON |= (1<<1);
-    //auto reload (repeated) | start for timer0
-    TCON = 0x9;   
-}
-
-//delay all use timer2
+// delay all use timer2
 void delay_ns(uint32_t ns)
 {
-    //timer2-4 prescaler 1
+    // timer2-4 prescaler 1
     TCFG0 = (TCFG0 & ~(0xff << 8)) | (0 << 8);
-    //divider 1
+    // divider 1
     TCFG1 = (TCFG1 & ~(0xf << 8)) | (0x4 << 8);
-    //interval = (400/3./2.)/1 = 67.5MHz
-    //  1/67.5 = 14ns
+    // interval = (400/3./2.)/1 = 67.5MHz
+    //   1/67.5 = 14ns
 
     int min_unit = 1000 / get_pclk();
     if (ns < min_unit) {
@@ -76,20 +123,45 @@ void delay_ns(uint32_t ns)
     TCNTB2 = count;
     TCMPB2 = 0;
 
-    //manual load count
-    TCON |= (1<<13);
+    // manual load count
+    TCON |= (1 << 13);
 
-    //one short && start for timer2
+    // one short && start for timer2
     TCON = (TCON & ~(0xf << 12)) | (0x1 << 12);
     while (TCNTO2) {
         // printf("count = %u\r\n", TCNTO2);
     };
 
-    //stop timer2?
+    // stop timer2?
     TCON = TCON & ~(0x1 << 12);
 }
 
-uint32_t get_tick_count(void)
+uint32_t get_tick_count(void) { return _tick; }
+
+ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
+                    void *cb, bool start)
 {
-    return _tick;
+    ktimer_t *timer = (ktimer_t *)kmalloc(sizeof(ktimer_t));
+    timer->callback = callback;
+    timer->repeat = repreated;
+    timer->interval = ms;
+    timer->state = kTimer_Uninit;
+    timer->cb = cb;
+
+    if (start) {
+        start_timer(timer);
+    }
+    return timer;
+}
+
+void cancel_timer(ktimer_t *timer) { timer->state = kTimer_Cancelled; }
+
+int start_timer(ktimer_t *timer)
+{
+    if (timer->state == kTimer_Uninit) {
+        timer->tick = _tick + timer->interval;
+        heap_append(_timer_queue, timer);
+        return 0;
+    }
+    return -1;
 }

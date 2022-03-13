@@ -3,13 +3,42 @@
 
 #include "common.h"
 
-typedef void(*timeout_callback_t)(void);
+typedef void (*timer_callback_t)(void *cb);
 
+typedef enum tag_timer_state {
+    kTimer_Uninit,
+    kTimer_Started,
+    kTimer_Cancelled,
+    kTimer_FiredOnce, // for repeated timer
+    kTimer_Done,
+} ktimer_state_t;
+typedef struct tag_ktimer {
+    uint32_t tick;
+    uint32_t interval;
+    BOOL repeat;
+    ktimer_state_t state;
+    void *cb;
+    timer_callback_t callback;
+} ktimer_t;
+
+// init 1ms timer0
+void init_timer(void);
+
+// irq handler
 void handle_timer0_interrupt(void);
-void set_timer0(uint32_t ms, int repeat, timeout_callback_t callback);
-void disable_timer(int index);
-void delay_ns(uint32_t ns);
+
+// get tickcount from startup
 uint32_t get_tick_count(void);
-// void delay_ms(uint32_t ms);
+
+// sync delay ns
+void delay_ns(uint32_t ns);
+
+// add timer
+ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
+                    void *cb, BOOL start);
+
+void cancel_timer(ktimer_t *timer);
+
+int start_timer(ktimer_t *timer);
 
 #endif

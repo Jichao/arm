@@ -19,5 +19,6 @@ typedef struct s_freelist_manager {
 freelist_entry_t *freelist_new(void);
 void* fmalloc(freelist_man_t* free_man, int size);
 void ffree(freelist_man_t* free_man, void* ptr);
+void* frealloc(freelist_man_t* free_man, void* ptr, int new_size);
 
 #endif

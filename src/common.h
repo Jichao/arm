@@ -66,5 +66,6 @@ uint32_t buff_to_u32(unsigned char* buff);
 #include "2440addr.h"
 
 extern void abort(void);
+typedef int bool;
 
 #endif

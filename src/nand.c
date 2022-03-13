@@ -32,7 +32,7 @@ static void nand_unselect_chip(void)
     NFCONT |= (1<<1);
 }
 
-static void nand_clear_rnb(void)
+/*static void nand_clear_rnb(void)
 {
     NFSTAT |= (1<<2);
 }
@@ -40,7 +40,7 @@ static void nand_clear_rnb(void)
 static void nand_wait_rnb(void)
 {
     while (!(NFSTAT & (1 << 2)));
-}
+}*/
 
 static void nand_wait_ready(void)
 {

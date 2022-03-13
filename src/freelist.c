@@ -147,3 +147,10 @@ void ffree(freelist_man_t *man, void *ptr)
     set_entry_free(curr, TRUE);
     man->head  = curr;
 }
+
+
+void* frealloc(freelist_man_t* free_man, void* ptr, int new_size)
+{
+    ffree(free_man, ptr);
+    return fmalloc(free_man, new_size);
+}

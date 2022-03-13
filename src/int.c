@@ -1,3 +1,4 @@
+#include "2440addr.h"
 #include "common.h"
 #include "int.h"
 #include "led.h"
@@ -18,11 +19,25 @@ extern uint32_t _irq;
 
 #define IRQ_HANDLER_ADDR (*(volatile uint32_t*)0x33f80440)
 
-uint32_t _last_sec[24];
+typedef struct tag_switch_conf {
+    int eint_index;
+    int last_tick;
+    switch_func_t callback;
+    void* cb;
+} switch_conf_t;
+
+//8:11:13:14:15:19
+switch_conf_t _switch_confs[6] = {
+    {8,0,0,0},
+    {11,0,0,0},
+    {13,0,0,0},
+    {14,0,0,0},
+    {15,0,0,0},
+    {19,0,0,0},
+};
 
 void interrupt_init(void)
 {
-    memset(_last_sec, 0, sizeof(uint32_t));
     //gpg-eint map: 0-8 3-11 5-13 6-14
     GPGCONF &= ~(3 | 3 << 6 | 3 << 10 | 3 << 12);
     GPGCONF |= (2 | 2 << 6 | 2 << 10 | 2 << 12);
@@ -43,26 +58,29 @@ void interrupt_init(void)
     );
 }
 
-static void handle_led(uint32_t int_index, uint32_t led_index)
+/*static void handle_led(uint32_t int_index, uint32_t led_index)
 {
     if (EINTPEND & (1 << int_index)) {
         invert_led(led_index);
         EINTPEND &= (1 << int_index);
     }
-}
+}*/
 
-static BOOL is_valid_interval(int index, int interval)
+void switch_handler(void)
 {
-    uint32_t curr_count = get_sec_count();
-    if (_last_sec[index] == 0) {
-        _last_sec[index] = curr_count;
-        return TRUE;
+    for (int i = 0; i < jcountof(_switch_confs); ++i) {
+        switch_conf_t* conf = &_switch_confs[i];
+        if (EINTPEND & (1 << conf->eint_index)) {
+            uint32_t curr_tick = get_tick_count();
+            if (conf->last_tick == 0 || curr_tick - conf->last_tick > 1000) {
+                conf->last_tick= curr_tick;
+                if (conf->callback) {
+                    conf->callback(conf->cb);
+                }
+            }
+            EINTPEND &= (1 << conf->eint_index);
+        }
     }
-    if (curr_count - _last_sec[index] > interval) {
-        _last_sec[index] = curr_count;
-        return TRUE;
-    }
-    return TRUE;
 }
 
 void irq_handler(void)
@@ -70,20 +88,9 @@ void irq_handler(void)
     uint32_t off = INTOFFSET;
 
     if (off == EINT8_23_OFF) {
-        handle_led(8, 0);
-        handle_led(11, 1);
-        if (EINTPEND & (1 << 13)) {
-            if (is_valid_interval(13, 0)) {
-                reset_time();
-            }
-            EINTPEND &= (1 << 13);
-        }
-        if (EINTPEND & (1 << 14)) {
-            if (is_valid_interval(14, 0)) {
-                output_time();
-            }
-            EINTPEND &= (1 << 14);
-        }
+        switch_handler();
+        // handle_led(8, 0);
+        // handle_led(11, 1);
         // handle_led(13, 2);
         // handle_led(14, 3);
     } else if (off == INT_TIMER0_OFF) {
@@ -91,6 +98,16 @@ void irq_handler(void)
     }
     SRCPND = 1<<off;
     INTPND = 1<<off;
+}
+
+void set_switch_callback(int switch_index, switch_func_t func, void* cb)
+{
+    if (switch_index < 1 || switch_index > 6) {
+        return ;
+    }
+    switch_conf_t* conf = &_switch_confs[switch_index - 1];
+    conf->callback = func;
+    conf->cb = cb;
 }
 
 void exception_handler(int index, uint32_t lastpc)

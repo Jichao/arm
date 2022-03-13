@@ -17,8 +17,6 @@
 extern char _ram_start;
 extern char _bss_end;
 
-void on_timer(void) { invert_led(0); }
-
 void test_lcd(void)
 {
     printf("start test lcd\r\n");
@@ -63,11 +61,28 @@ void play_mp3(BOOL direct)
     printf("end play mp3...\r\n");
 }
 
+void on_switch1(void* cb)
+{
+    ktimer_t* timer = (ktimer_t*)cb;
+    cancel_timer(timer);
+}
+
+void test_timer(void)
+{
+    printf("start test timer...\r\n");
+    ktimer_t* timer1 = create_timer(2000, TRUE, (timer_callback_t)&invert_led, (void*)1, TRUE);
+    create_timer(3000, TRUE, (timer_callback_t)&invert_led, (void*)2, TRUE);
+    set_switch_callback(1, &on_switch1, timer1);
+    printf("end test timer...\r\n");
+}
+
 void entry(void)
 {
     printf("bbs end %p ram start %p rom size %x\r\n", &_bss_end, &_ram_start,
            ((int)&_bss_end - (int)&_ram_start));
     kmalloc_init();
+
+    init_timer();
 
     printf("led inited\r\n");
     led_init();
@@ -77,9 +92,6 @@ void entry(void)
     interrupt_init();
     printf("interupt inited\r\n");
 
-    set_timer0(1, TRUE, &on_timer);
-    printf("timer0 inited\r\n");
-
     while (1) {
         printf("  ***function menu*** \r\n");
         printf("  current tick count = %u\r\n", get_tick_count());
@@ -87,6 +99,7 @@ void entry(void)
         printf("  2. play wav test\r\n");
         printf("  3. play mp3 sync test\r\n");
         printf("  4. play mp3 async test\r\n");
+        printf("  5. timer test\r\n");
 
         char choice = getc();
         int c = choice - '0';
@@ -102,6 +115,9 @@ void entry(void)
             break;
         case 4:
             play_mp3(TRUE);
+            break;
+            case 5:
+            test_timer();
             break;
         default:
             break;

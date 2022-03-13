@@ -4,7 +4,7 @@ OBJDUMP := arm-linux-objdump
 
 GCC_LIB_DIR := /home/book/FriendlyARM/toolschain/4.4.3/lib/gcc/arm-none-linux-gnueabi/4.4.3
 
-CFLAGS 	:= -nostdinc -fno-builtin -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \
+CFLAGS 	:= -nostdinc -fno-builtin -Werror -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \
 	-ffreestanding -std=c99 \
 	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++
 
@@ -41,7 +41,7 @@ libs:
 setup: build
 
 build:
-	mkdir -p build
+	mkdir -p build/base
 
 $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(LD) -T$(NAME).lds -o $(ELF) $^ $(LDFLAGS)

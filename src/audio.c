@@ -289,7 +289,7 @@ void free_pcm_buffer(pcm_buffer* pcm) {
     kfree(pcm);
 }
 
-int play_mp3_async(unsigned char *buff, int size)
+int play_mp3_async(const unsigned char *buff, int size)
 {
     printf("ASYNC start play mp3 audio, buffer = %p, size = %d\r\n", buff, size);
     _pcm = create_pcm_buffer(2 << 20);
@@ -308,7 +308,7 @@ int play_mp3_async(unsigned char *buff, int size)
     return 0;
 }
 
-int play_mp3_sync(unsigned char *buff, int size)
+int play_mp3_sync(const unsigned char *buff, int size)
 {
     uint32_t xx_tick, xx_interval;
     printf("SYNC start play mp3 audio, buffer = %p, size = %d\r\n", buff, size);
@@ -349,7 +349,7 @@ int play_mp3_sync(unsigned char *buff, int size)
 }
 
 
-int start_play_mp3(unsigned char *buff, int size, BOOL direct)
+int start_play_mp3(const unsigned char *buff, int size, BOOL direct)
 {
     mp3_direct = direct;
     if (mp3_direct)
