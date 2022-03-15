@@ -9,8 +9,9 @@ typedef void (*timer_callback_t)(void *cb);
 typedef enum tag_timer_state {
     kTimer_Uninit,
     kTimer_Started,
-    kTimer_Cancelled,
+    kTimer_Cancelled, // 可以重新start
     kTimer_FiredOnce, // for repeated timer
+    kTimer_Destroyed, // 直接删除掉了，无法重新start
     kTimer_Done,
 } ktimer_state_t;
 typedef struct tag_ktimer {
@@ -38,9 +39,9 @@ void delay_ns(uint32_t ns);
 ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
                     void *cb, BOOL start);
 
-void cancel_timer(ktimer_t *timer);
-
 int start_timer(ktimer_t *timer);
+void stop_timer(ktimer_t *timer);
+void destroy_timer(ktimer_t *timer);
 
 extern heap_t *_timer_queue;
 

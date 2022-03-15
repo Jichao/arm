@@ -61,28 +61,47 @@ void play_mp3(BOOL direct)
     printf("end play mp3...\r\n");
 }
 
+ktimer_t *timer1;
+ktimer_t *timer2;
+
 void on_switch1(void *cb)
 {
-    ktimer_t *timer = (ktimer_t *)cb;
-    cancel_timer(timer);
+    printf("switch 1 switched\r\n");
+    destroy_timer(timer1);
+    timer1 = NULL;
 }
 
 void on_timer1(void *cb)
 {
     dprintk("%u ===== on timer 1 called =====\r\n", get_tick_count());
+    invert_led((int)cb);
+}
+
+void on_timer2(void *cb)
+{
+    dprintk("%u ===== on timer 2 called =====\r\n", get_tick_count());
 }
 
 void test_timer(void)
 {
     dprintk("start test timer...\r\n");
-    ktimer_t *timer1 = create_timer(2000, TRUE, (timer_callback_t)&on_timer1,
-                                    (void *)1, TRUE);
-    ktimer_t *timer = (ktimer_t *)heap_top(_timer_queue);
-    dprintk("top timer = %p timer1 = %p\r\n", timer, timer1);
-    dprintk("after create timer1...\r\n");
-    // create_timer(3000, TRUE, (timer_callback_t)&invert_led, (void *)2, TRUE);
-    // set_switch_callback(1, &on_switch1, timer1);
-    // printf("end test timer...\r\n");
+    timer1 =
+        create_timer(2000, TRUE, (timer_callback_t)&on_timer1, (void *)1, TRUE);
+    timer2 = create_timer(2000, TRUE, (timer_callback_t)&on_timer2, NULL, TRUE);
+    set_switch_callback(1, &on_switch1, NULL);
+}
+
+void end_timer(void)
+{
+    if (timer1) {
+        destroy_timer(timer1);
+        timer1 = NULL;
+    }
+
+    if (timer2) {
+        destroy_timer(timer2);
+        timer2 = NULL;
+    }
 }
 
 void entry(void)
@@ -101,6 +120,8 @@ void entry(void)
     interrupt_init();
     printf("interupt inited\r\n");
 
+    int c = 0;
+
     while (1) {
         printf("  ***function menu*** \r\n");
         printf("  current tick count = %u\r\n", get_tick_count());
@@ -111,7 +132,12 @@ void entry(void)
         printf("  5. timer test\r\n");
 
         char choice = getc();
-        int c = choice - '0';
+        if (c == 5) {
+            printf("timer ended\r\n");
+            end_timer();
+        }
+
+        c = choice - '0';
         switch (c) {
         case 1:
             test_lcd();
