@@ -105,20 +105,15 @@ heap_t *heap_create(heap_type_t type, int heap_size,
                     compare_func_t compare_func, heap_element_t *values,
                     int values_count)
 {
-    if (heap_size == 0) {
-        return 0;
-    }
-
     heap_t *heap = (heap_t *)kmalloc(sizeof(heap_t));
-    heap->alloc_size = heap_size;
+    heap->alloc_size = MAX(heap_size, 10);
     heap->size = heap_size;
     heap->type = type;
     heap->compare_func = compare_func;
-    heap->values = 0;
+    heap->values =
+        (heap_element_t *)kmalloc(heap->alloc_size * sizeof(heap_element_t));
 
     if (heap_size) {
-        heap->values =
-            (heap_element_t *)kmalloc(heap_size * sizeof(heap_element_t));
         int size = MIN(heap_size, values_count);
         for (int i = 0; i < size; ++i) {
             heap->values[i] = values[i];
@@ -144,13 +139,15 @@ heap_element_t heap_pop(heap_t *heap)
 
 void heap_append(heap_t *heap, heap_element_t num)
 {
+    // dprintk("current heap value = %p\r\n", heap->values);
     if (heap->size + 1 > heap->alloc_size) {
-        int new_alloc_size = heap->size * 2;
+        int new_alloc_size = (heap->size + 1) * 2;
         heap->values = (heap_element_t *)krealloc(
             heap->values, new_alloc_size * sizeof(heap_element_t));
     }
     heap->values[heap->size++] = num;
     shift_up(heap, heap->size - 1);
+    // dprintk("after heap size = %d, top = %p\r\n", heap->size, heap_top(heap));
 }
 
 void heap_destroy(heap_t *heap)
@@ -161,6 +158,7 @@ void heap_destroy(heap_t *heap)
 
 heap_element_t heap_top(heap_t *heap)
 {
+    // dprintk("heap top called: %p size: %d\r\n", heap, heap->size);
     if (heap->size > 0) {
         return heap->values[0];
     }

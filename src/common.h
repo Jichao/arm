@@ -51,11 +51,13 @@ typedef char int8_t;
         printf(__VA_ARGS__); \
     }
 
-#define UDEBUG 0
+#define UDEBUG 1
 
 #define dprintk(...) \
-    if (UDEBUG == 1) \
+    if (UDEBUG == 1) { \
+        printf("%s(%d): %s :", __FILE__, __LINE__, __FUNCTION__); \
         printf(__VA_ARGS__); \
+    }
 
 extern uint32_t jround(uint32_t value, uint32_t align, BOOL up); 
 #define jcountof(var) (sizeof(var) / sizeof(var[0]))

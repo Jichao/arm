@@ -61,19 +61,28 @@ void play_mp3(BOOL direct)
     printf("end play mp3...\r\n");
 }
 
-void on_switch1(void* cb)
+void on_switch1(void *cb)
 {
-    ktimer_t* timer = (ktimer_t*)cb;
+    ktimer_t *timer = (ktimer_t *)cb;
     cancel_timer(timer);
+}
+
+void on_timer1(void *cb)
+{
+    dprintk("%u ===== on timer 1 called =====\r\n", get_tick_count());
 }
 
 void test_timer(void)
 {
-    printf("start test timer...\r\n");
-    ktimer_t* timer1 = create_timer(2000, TRUE, (timer_callback_t)&invert_led, (void*)1, TRUE);
-    create_timer(3000, TRUE, (timer_callback_t)&invert_led, (void*)2, TRUE);
-    set_switch_callback(1, &on_switch1, timer1);
-    printf("end test timer...\r\n");
+    dprintk("start test timer...\r\n");
+    ktimer_t *timer1 = create_timer(2000, TRUE, (timer_callback_t)&on_timer1,
+                                    (void *)1, TRUE);
+    ktimer_t *timer = (ktimer_t *)heap_top(_timer_queue);
+    dprintk("top timer = %p timer1 = %p\r\n", timer, timer1);
+    dprintk("after create timer1...\r\n");
+    // create_timer(3000, TRUE, (timer_callback_t)&invert_led, (void *)2, TRUE);
+    // set_switch_callback(1, &on_switch1, timer1);
+    // printf("end test timer...\r\n");
 }
 
 void entry(void)
@@ -116,7 +125,7 @@ void entry(void)
         case 4:
             play_mp3(TRUE);
             break;
-            case 5:
+        case 5:
             test_timer();
             break;
         default:

@@ -118,8 +118,8 @@ void * kcalloc(uint32_t items, uint32_t count)
     return ptr;
 }
 
-
 void* krealloc(void* ptr, int new_size)
 {
-    return frealloc(&_meminfo->free_man, ptr, new_size);   
+    dprintk("realloc: old-ptr %p, new_size = %d\r\n", ptr, new_size);
+    return frealloc(&_meminfo->free_man, ptr, new_size);
 }

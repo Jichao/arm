@@ -2,6 +2,7 @@
 #define _TIMER_HEADER_
 
 #include "common.h"
+#include "base/heap.h"
 
 typedef void (*timer_callback_t)(void *cb);
 
@@ -40,5 +41,7 @@ ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
 void cancel_timer(ktimer_t *timer);
 
 int start_timer(ktimer_t *timer);
+
+extern heap_t *_timer_queue;
 
 #endif

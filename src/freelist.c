@@ -51,13 +51,15 @@ static void set_next_entry(freelist_entry_t *curr, freelist_entry_t *next)
     set_entry_free(curr, TRUE);
 }
 
-static BOOL is_entry_tail(freelist_entry_t *freelist)
+/*static BOOL is_entry_tail(freelist_entry_t *freelist)
 {
     return (get_next_entry(freelist, kEntryType_Logic) == NULL);
-}
+}*/
 
 freelist_entry_t *freelist_new(void)
 {
+    dprintk("free list new\r\n");
+
     int init_size = 4 << 20;
     freelist_entry_t *entry = (freelist_entry_t *)kmalloc(init_size);
     entry->next = NULL;
@@ -84,10 +86,11 @@ freelist_entry_t *new_sub_entry(freelist_entry_t *freelist, int size)
 freelist_entry_t *get_free_entry(freelist_entry_t *entry, int size,
                                  freelist_entry_t **prev_list)
 {
+    dprintk("get free entry head %p size %d\r\n", entry, size);
     kassert(entry, "invalid free entry %p\r\n", entry);
     *prev_list = NULL;
-    for (; !is_entry_tail(entry); *prev_list = entry, entry = get_next_entry(entry, kEntryType_Logic)) {
-        //dprintk("entry free %d size = %d, need size %d\n", is_entry_free(entry), entry->len, size);
+    for (; entry != NULL; *prev_list = entry, entry = get_next_entry(entry, kEntryType_Logic)) {
+        dprintk("entry free %d size = %d, need size %d\r\n", is_entry_free(entry), entry->len, size);
         if (is_entry_free(entry) && entry->len >= size) {
             return entry;
         }
@@ -97,6 +100,7 @@ freelist_entry_t *get_free_entry(freelist_entry_t *entry, int size,
 
 void *fmalloc(freelist_man_t *man, int size)
 {
+    dprintk("fmalloc size = %d\r\n", size);
     kassert(man, "invalid man");
     //kassert((size > 16 && size < ((4 << 20) - sizeof(freelist_entry_t))), "invalid size");
 
@@ -104,12 +108,13 @@ void *fmalloc(freelist_man_t *man, int size)
     freelist_entry_t *prev = NULL;
     freelist_entry_t *next = NULL;
     freelist_entry_t *curr = get_free_entry(man->head, size, &prev);
+    void* ptr = NULL;
     if (curr) {
         next = get_next_entry(curr, kEntryType_Logic);
         freelist_entry_t *sub_entry = new_sub_entry(curr, size);
         //能够split出来
         if (sub_entry) {
-            return (char *)sub_entry + sizeof(freelist_entry_t);
+            ptr = (char *)sub_entry + sizeof(freelist_entry_t);
         }
         else {
             if (prev) {
@@ -119,7 +124,7 @@ void *fmalloc(freelist_man_t *man, int size)
                 set_next_entry(man->head, next);
             }
             set_entry_free(curr, FALSE);
-            return (char *)curr + sizeof(freelist_entry_t);
+            ptr = (char *)curr + sizeof(freelist_entry_t);
         }
     }
     else {
@@ -129,12 +134,16 @@ void *fmalloc(freelist_man_t *man, int size)
         freelist_entry_t *sub_entry = new_sub_entry(new_entry, size);
         set_next_entry(new_entry, man->head);
         man->head = new_entry;
-        return (char *)sub_entry + sizeof(freelist_entry_t);
+        ptr = (char *)sub_entry + sizeof(freelist_entry_t);
     }
+    dprintk("fmalloc size: %d ptr = %p\r\n", size, ptr);
+    return ptr;
 }
 
 void ffree(freelist_man_t *man, void *ptr) 
 {
+    dprintk("ffree ptr : %p\r\n", ptr);
+
     freelist_entry_t* curr = (freelist_entry_t*)((char*)ptr - sizeof(freelist_entry_t));
     kassert(!is_entry_free(curr), "invalid free pointer: %p\r\n", ptr);
 
@@ -151,6 +160,8 @@ void ffree(freelist_man_t *man, void *ptr)
 
 void* frealloc(freelist_man_t* free_man, void* ptr, int new_size)
 {
+    dprintk("frealloc old ptr : %p, new_size: %d\r\n", ptr, new_size);
+
     ffree(free_man, ptr);
     return fmalloc(free_man, new_size);
 }

@@ -22,7 +22,7 @@ int compare_timer(heap_element_t a, heap_element_t b)
     }
 }
 
-void init_timer()
+void init_timer(void)
 {
     // minimum interval:
     //   pclk/{prescaler+1}/divider
@@ -51,18 +51,22 @@ void dispatch_timer(void)
     while (TRUE) {
         timer = (ktimer_t *)heap_top(_timer_queue);
         if (!timer) {
+            // dprintk("no timer in the timer queue\r\n");
             break;
         }
 
         if (timer->state == kTimer_Cancelled) {
+            // dprintk("timer cancelled\r\n");
             heap_pop(_timer_queue);
         }
         else {
-            if (timer->tick >= _tick) {
+            if (_tick >= timer->tick) {
+                // dprintk("timer fired\r\n");
                 heap_pop(_timer_queue);
                 if (timer->repeat) {
                     timer->tick += timer->interval;
                     timer->state = kTimer_FiredOnce;
+                    heap_append(_timer_queue, timer);
                 }
                 else {
                     timer->state = kTimer_Done;
@@ -72,6 +76,7 @@ void dispatch_timer(void)
                 }
             }
             else {
+                // dprintk("top timer tick = %u curr tick = %u\r\n", timer->tick, _tick);
                 break;
             }
         }
@@ -141,6 +146,7 @@ uint32_t get_tick_count(void) { return _tick; }
 ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
                     void *cb, bool start)
 {
+    dprintk("create timer: %u ms repreat: %d, start: %d\r\n", ms, repreated, start);
     ktimer_t *timer = (ktimer_t *)kmalloc(sizeof(ktimer_t));
     timer->callback = callback;
     timer->repeat = repreated;
@@ -158,8 +164,10 @@ void cancel_timer(ktimer_t *timer) { timer->state = kTimer_Cancelled; }
 
 int start_timer(ktimer_t *timer)
 {
+    dprintk("start timer: %p\r\n", timer);
     if (timer->state == kTimer_Uninit) {
         timer->tick = _tick + timer->interval;
+        dprintk("heap append timer %p\r\n", timer);
         heap_append(_timer_queue, timer);
         return 0;
     }
