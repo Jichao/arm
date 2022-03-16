@@ -118,7 +118,9 @@ void test_timer(void)
         delay_ns(2000*1000);
         main_count++;
         int a = target;
+        disable_irq();
         target++;
+        restore_irq();
         int diff = target - a;
         if (diff != 1) {
             printf("bingogogogogogogogo diff = %d\r\n", diff);
