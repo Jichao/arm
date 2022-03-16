@@ -97,7 +97,7 @@ void* kmalloc(int size)
 void kfree(void* ptr)
 {
     _memerr = 0;
-    dprintk("kfree %p\r\n", ptr);
+    // dprintk("kfree %p\r\n", ptr);
     if ((uint32_t)ptr % SECTION_SIZE == 0) {
         int index = get_section_index((uint32_t)ptr);
         int len = _meminfo->section_len[index];
@@ -108,7 +108,7 @@ void kfree(void* ptr)
     else {
         ffree(&_meminfo->free_man, ptr);
     }
-    dprintk("kfree %p done\n", ptr);
+    // dprintk("kfree %p done\r\n", ptr);
 }
 
 void * kcalloc(uint32_t items, uint32_t count)
@@ -120,6 +120,6 @@ void * kcalloc(uint32_t items, uint32_t count)
 
 void* krealloc(void* ptr, int new_size)
 {
-    dprintk("realloc: old-ptr %p, new_size = %d\r\n", ptr, new_size);
+    // dprintk("realloc: old-ptr %p, new_size = %d\r\n", ptr, new_size);
     return frealloc(&_meminfo->free_man, ptr, new_size);
 }

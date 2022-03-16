@@ -139,3 +139,18 @@ void exception_handler(int index, uint32_t lastpc)
     printf("unhandled now entering fuck mode\r\n");
     while (1) ; 
 }
+
+uint32_t saved_intmsk;
+
+//禁用中断
+void disable_irq(void)
+{
+    saved_intmsk = INTMSK;
+    INTMSK = 0xffffffff;
+}
+
+//启用中断
+void restore_irq(void)
+{
+    INTMSK = saved_intmsk;
+}

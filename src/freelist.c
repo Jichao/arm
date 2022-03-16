@@ -160,7 +160,7 @@ void ffree(freelist_man_t *man, void *ptr)
 
 void* frealloc(freelist_man_t* free_man, void* ptr, int new_size)
 {
-    dprintk("frealloc old ptr : %p, new_size: %d\r\n", ptr, new_size);
+    // dprintk("frealloc old ptr : %p, new_size: %d\r\n", ptr, new_size);
 
     ffree(free_man, ptr);
     return fmalloc(free_man, new_size);

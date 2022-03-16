@@ -9,4 +9,7 @@ void interrupt_init(void);
 void irq_handler(void);
 void exception_handler(int index, uint32_t lastpc);
 void set_switch_callback(int switch_index, switch_func_t func, void* cb);
+
+void disable_irq(void);
+void restore_irq(void);
 #endif

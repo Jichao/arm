@@ -63,33 +63,10 @@ void play_mp3(BOOL direct)
 
 ktimer_t *timer1;
 ktimer_t *timer2;
-
-void on_switch1(void *cb)
-{
-    printf("switch 1 switched\r\n");
-    destroy_timer(timer1);
-    timer1 = NULL;
-}
-
-void on_timer1(void *cb)
-{
-    dprintk("%u ===== on timer 1 called =====\r\n", get_tick_count());
-    invert_led((int)cb);
-}
-
-void on_timer2(void *cb)
-{
-    dprintk("%u ===== on timer 2 called =====\r\n", get_tick_count());
-}
-
-void test_timer(void)
-{
-    dprintk("start test timer...\r\n");
-    timer1 =
-        create_timer(2000, TRUE, (timer_callback_t)&on_timer1, (void *)1, TRUE);
-    timer2 = create_timer(2000, TRUE, (timer_callback_t)&on_timer2, NULL, TRUE);
-    set_switch_callback(1, &on_switch1, NULL);
-}
+volatile uint32_t target;
+volatile int done;
+volatile uint32_t isr_count;
+volatile uint32_t main_count;
 
 void end_timer(void)
 {
@@ -102,6 +79,52 @@ void end_timer(void)
         destroy_timer(timer2);
         timer2 = NULL;
     }
+}
+
+void on_switch1(void *cb)
+{
+    printf("switch 1 switched\r\n");
+    done = TRUE;
+    end_timer();
+}
+
+void on_timer1(void *cb)
+{
+    // dprintk("target = %d\r\n", target);
+    isr_count++;
+    target++;
+    // dprintk("%u ===== on timer 1 called =====\r\n", get_tick_count());
+    // invert_led((int)cb);
+}
+
+void on_timer2(void *cb)
+{
+    // dprintk("%u ===== on timer 2 called =====\r\n", get_tick_count());
+}
+
+void test_timer(void)
+{
+    dprintk("start test timer...\r\n");
+    timer1 =
+        create_timer(10, TRUE, (timer_callback_t)&on_timer1, (void *)1, TRUE);
+    timer2 = create_timer(2000, TRUE, (timer_callback_t)&on_timer2, NULL, TRUE);
+    set_switch_callback(1, &on_switch1, NULL);
+
+    done = 0;
+    target = 0;
+    isr_count = 0;
+    main_count = 0;
+    while (!done) {
+        delay_ns(2000*1000);
+        main_count++;
+        int a = target;
+        target++;
+        int diff = target - a;
+        if (diff != 1) {
+            printf("bingogogogogogogogo diff = %d\r\n", diff);
+        }
+    }
+    printf("done: main_count: %u, isr_count: %u combine: %u target: %u\r\n", main_count, isr_count, main_count + isr_count, target);
 }
 
 void entry(void)
