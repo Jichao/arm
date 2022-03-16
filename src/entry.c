@@ -13,6 +13,7 @@
 #include "timer.h"
 #include "uart.h"
 #include "wav.h"
+#include "base/spinlock.h"
 
 extern char _ram_start;
 extern char _bss_end;
@@ -67,6 +68,7 @@ volatile uint32_t target;
 volatile int done;
 volatile uint32_t isr_count;
 volatile uint32_t main_count;
+spinlock_t lock = 0;
 
 void end_timer(void)
 {
@@ -92,7 +94,9 @@ void on_timer1(void *cb)
 {
     // dprintk("target = %d\r\n", target);
     isr_count++;
+    spinlock_lock(&lock);
     target++;
+    spinlock_unlock(&lock);
     // dprintk("%u ===== on timer 1 called =====\r\n", get_tick_count());
     // invert_led((int)cb);
 }
@@ -118,9 +122,9 @@ void test_timer(void)
         delay_ns(2000*1000);
         main_count++;
         int a = target;
-        disable_irq();
+        spinlock_lock(&lock);
         target++;
-        restore_irq();
+        spinlock_unlock(&lock);
         int diff = target - a;
         if (diff != 1) {
             printf("bingogogogogogogogo diff = %d\r\n", diff);
