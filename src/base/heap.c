@@ -1,6 +1,5 @@
-#include "heap.h"
-#include "../common.h"
-#include "../kmalloc.h"
+#include "base/heap.h"
+#include "mem/kmalloc.h"
 
 static void swap(heap_element_t values[], int i, int j)
 {
@@ -47,7 +46,7 @@ static int compare_element(heap_t *heap, heap_element_t a, heap_element_t b)
     }
 }
 
-static BOOL need_swap(heap_t *heap, int i, int j)
+static bool need_swap(heap_t *heap, int i, int j)
 {
     if (heap->values[i] == heap->values[j]) {
         return FALSE;

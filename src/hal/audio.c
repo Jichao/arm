@@ -1,9 +1,9 @@
-#include "audio.h"
-#include "clock.h"
+#include "hal/audio.h"
+#include "hal/clock.h"
+#include "audio/mp3.h"
+#include "mem/kmalloc.h"
 #include "common.h"
 #include "mad.h"
-#include "kmalloc.h"
-#include "mp3.h"
 #include "timer.h"
 
 #define WAVE_FORMAT_PCM 0x0001
@@ -12,7 +12,7 @@
 #define L3C (1 << 4) // GPB4 = L3CLOCK
 #define STATUS_ADDR (0x14 + 2)
 
-BOOL mp3_direct = 0;
+bool mp3_direct = 0;
 
 typedef void (*play_func_t)(uint8_t* data);
 typedef struct tag_pcm_buffer {
@@ -36,7 +36,7 @@ void play_pcm(uint8_t *data)
 uint32_t _supported_freqs[] = {8000,  11025, 16000, 22050, 32000,
                                44100, 48000, 64000, 88200, 96000};
 
-static void write_l3(uint8_t data, BOOL address)
+static void write_l3(uint8_t data, bool address)
 {
     int i, j;
     if (address) {
@@ -143,7 +143,7 @@ void init_iis(uint32_t fs, uint32_t bits_per_sample, uint32_t channels)
     IISFCON = 1 << 13;
 }
 
-static BOOL is_freq_ok(uint32_t freq)
+static bool is_freq_ok(uint32_t freq)
 {
     int i = 0;
     for (; i < jcountof(_supported_freqs); ++i) {
@@ -349,7 +349,7 @@ int play_mp3_sync(const unsigned char *buff, int size)
 }
 
 
-int start_play_mp3(const unsigned char *buff, int size, BOOL direct)
+int start_play_mp3(const unsigned char *buff, int size, bool direct)
 {
     mp3_direct = direct;
     if (mp3_direct)

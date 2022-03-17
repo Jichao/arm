@@ -1,7 +1,7 @@
 #include "common.h"
-#include "freelist.h"
-#include "kmalloc.h"
-#include "bits.h"
+#include "mem/freelist.h"
+#include "mem/kmalloc.h"
+#include "base/bits.h"
 
 //refer: https://docs.google.com/document/d/1ERtQnBdY7skZ4Mky2hB40W0jXa9zcjKX0AHaPLB1QEI/edit#
 extern char _ram_start;
@@ -17,7 +17,7 @@ extern char _bss_end;
 meminfo_t* _meminfo;
 int _memerr;
 
-static uint32_t round_section(uint32_t addr, BOOL up) {
+static uint32_t round_section(uint32_t addr, bool up) {
     return jround(addr, SECTION_SIZE, up);
 }
 
@@ -116,6 +116,11 @@ void * kcalloc(uint32_t items, uint32_t count)
     void* ptr = kmalloc(items * count);
     zero(ptr, items * count);
     return ptr;
+}
+
+void *kzmalloc(int size)
+{
+    return kcalloc(size, 1);
 }
 
 void* krealloc(void* ptr, int new_size)

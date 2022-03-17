@@ -1,8 +1,8 @@
 #ifndef _TIMER_HEADER_
 #define _TIMER_HEADER_
 
-#include "common.h"
 #include "base/heap.h"
+#include "base/types.h"
 
 typedef void (*timer_callback_t)(void *cb);
 
@@ -17,7 +17,7 @@ typedef enum tag_timer_state {
 typedef struct tag_ktimer {
     uint32_t tick;
     uint32_t interval;
-    BOOL repeat;
+    bool repeat;
     ktimer_state_t state;
     void *cb;
     timer_callback_t callback;
@@ -36,8 +36,8 @@ uint32_t get_tick_count(void);
 void delay_ns(uint32_t ns);
 
 // add timer
-ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
-                    void *cb, BOOL start);
+ktimer_t *create_timer(uint32_t ms, bool repreated, timer_callback_t callback,
+                    void *cb, bool start);
 
 int start_timer(ktimer_t *timer);
 void stop_timer(ktimer_t *timer);

@@ -1,7 +1,8 @@
 #include "timer.h"
-#include "base/heap.h"
-#include "clock.h"
-#include "kmalloc.h"
+#include "common.h"
+#include "mem/kmalloc.h"
+#include "hal/clock.h"
+#include "hal/2440addr.h"
 
 volatile uint32_t _tick = 0;
 
@@ -148,7 +149,7 @@ void delay_ns(uint32_t ns)
 
 uint32_t get_tick_count(void) { return _tick; }
 
-ktimer_t *create_timer(uint32_t ms, BOOL repreated, timer_callback_t callback,
+ktimer_t *create_timer(uint32_t ms, bool repreated, timer_callback_t callback,
                        void *cb, bool start)
 {
     dprintk("create timer: %u ms repreat: %d, start: %d\r\n", ms, repreated,

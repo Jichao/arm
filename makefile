@@ -6,7 +6,7 @@ GCC_LIB_DIR := /home/book/FriendlyARM/toolschain/4.4.3/lib/gcc/arm-none-linux-gn
 
 CFLAGS 	:= -nostdinc -fno-builtin -Werror -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \
 	-ffreestanding -std=c99 \
-	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++
+	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++ -Isrc
 
 LD := arm-linux-ld
 LDFLAGS := -lgcc -L$(GCC_LIB_DIR)
@@ -30,18 +30,15 @@ ELF := $(BUILD_DIR)/$(NAME).elf
 BINARY := $(patsubst %.elf, %.bin, $(ELF))
 DISASSM := $(patsubst %.elf, %.dis, $(ELF))
 
+dir_guard=@mkdir -p $(@D)
+
 .PHONY: all clean test setup libs
 
-all: setup libs $(BINARY)
+all: libs $(BINARY)
 
 libs:
 	cd lib/libc/src; make; cd ../../;
 	cd 3rd/libmad-0.15.1b; make -f makefile.arm; cd ../../;
-
-setup: build
-
-build:
-	mkdir -p build/base
 
 $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(LD) -T$(NAME).lds -o $(ELF) $^ $(LDFLAGS)
@@ -49,9 +46,11 @@ $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(OBJDUMP) -D -m arm $(ELF) > $(DISASSM)
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.S
+	$(dir_guard)
 	arm-linux-gcc $(CFLAGS) -c $^ -o $@
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.c
+	$(dir_guard)
 	arm-linux-gcc $(CFLAGS) -c $^ -o $@
 
 clean:

@@ -1,7 +1,8 @@
-#include "ram.h"
-#include "nand.h"
-#include "clock.h"
-#include "entry.h"
+#include "hal/ram.h"
+#include "hal/nand.h"
+#include "hal/clock.h"
+#include "hal/2440addr.h"
+#include "entry/entry.h"
 
 typedef void (*t_void_func)(void);
 

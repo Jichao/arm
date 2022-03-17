@@ -1,19 +1,18 @@
-#include "entry.h"
-#include "apple_wav.h"
-#include "audio.h"
-#include "clock.h"
-#include "common.h"
-#include "girl.h"
-#include "int.h"
-#include "kmalloc.h"
-#include "lcd.h"
-#include "led.h"
-#include "mp3.h"
-#include "stdio.h"
-#include "timer.h"
-#include "uart.h"
-#include "wav.h"
+#include "entry/entry.h"
+#include "audio/mp3.h"
+#include "audio/wav.h"
 #include "base/spinlock.h"
+#include "common.h"
+#include "hal/audio.h"
+#include "hal/clock.h"
+#include "hal/int.h"
+#include "hal/lcd.h"
+#include "hal/led.h"
+#include "hal/uart.h"
+#include "mem/kmalloc.h"
+#include "res/apple_wav.h"
+#include "res/girl.h"
+#include "timer.h"
 
 extern char _ram_start;
 extern char _bss_end;
@@ -55,7 +54,7 @@ void play_wav(void)
     kfree(wav);
 }
 
-void play_mp3(BOOL direct)
+void play_mp3(bool direct)
 {
     printf("start play mp3...\r\n");
     start_play_mp3(apple_mp3, apple_mp3_size(), direct);
@@ -119,7 +118,7 @@ void test_timer(void)
     isr_count = 0;
     main_count = 0;
     while (!done) {
-        delay_ns(2000*1000);
+        delay_ns(2000 * 1000);
         main_count++;
         int a = target;
         spinlock_lock(&lock);
@@ -130,7 +129,8 @@ void test_timer(void)
             printf("bingogogogogogogogo diff = %d\r\n", diff);
         }
     }
-    printf("done: main_count: %u, isr_count: %u combine: %u target: %u\r\n", main_count, isr_count, main_count + isr_count, target);
+    printf("done: main_count: %u, isr_count: %u combine: %u target: %u\r\n",
+           main_count, isr_count, main_count + isr_count, target);
 }
 
 void entry(void)

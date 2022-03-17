@@ -1,9 +1,9 @@
-#include "2440addr.h"
-#include "common.h"
-#include "int.h"
-#include "led.h"
+#include "hal/2440addr.h"
+#include "hal/led.h"
+#include "hal/rtc.h"
+#include "base/macros.h"
+#include "hal/int.h"
 #include "timer.h"
-#include "rtc.h"
 
 extern uint32_t _irq;
 

@@ -14,12 +14,12 @@ typedef enum s_entry_type {
 
 extern int _memerr;
 
-static BOOL is_entry_free(freelist_entry_t *freelist)
+static bool is_entry_free(freelist_entry_t *freelist)
 {
     return !((uint32_t)freelist->next & 1);
 }
 
-static void set_entry_free(freelist_entry_t *freelist, BOOL free)
+static void set_entry_free(freelist_entry_t *freelist, bool free)
 {
     if (free) {
         freelist->next = (freelist_entry_t *)((uint32_t)freelist->next & ~1);
@@ -51,7 +51,7 @@ static void set_next_entry(freelist_entry_t *curr, freelist_entry_t *next)
     set_entry_free(curr, TRUE);
 }
 
-/*static BOOL is_entry_tail(freelist_entry_t *freelist)
+/*static bool is_entry_tail(freelist_entry_t *freelist)
 {
     return (get_next_entry(freelist, kEntryType_Logic) == NULL);
 }*/

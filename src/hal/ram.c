@@ -1,6 +1,7 @@
 #include "ram.h"
-#include "common.h"
-#include "clock.h"
+#include "hal/clock.h"
+#include "hal/2440addr.h"
+#include "base/macros.h"
 
 #define EM63_TRCD_NS 20
 #define EM63_TRC_NS 60

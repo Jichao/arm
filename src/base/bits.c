@@ -1,13 +1,13 @@
 #include "bits.h"
 
-BOOL is_bit_set(uint8_t* bits, int index)
+bool is_bit_set(uint8_t* bits, int index)
 {
     int byte_index = index / 8;
     int bit_index = index  % 8;
     return (bits[byte_index] & (1 << bit_index));
 }
 
-void set_bit(uint8_t* bits, int index, BOOL value)
+void set_bit(uint8_t* bits, int index, bool value)
 {
     int byte_index = index / 8;
     int bit_index = index  % 8;
@@ -20,7 +20,7 @@ void set_bit(uint8_t* bits, int index, BOOL value)
 
 int find_empty_bit(uint8_t* bits, int maxlen, int length)
 {
-    BOOL set = FALSE;
+    bool set = FALSE;
     int count = 0;
     for (int i = 0; i < maxlen; ++i) {
         set |= is_bit_set(bits, i);

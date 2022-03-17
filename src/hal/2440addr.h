@@ -134,6 +134,8 @@
 #define GPG5_IN (0xf3fc)
 #define GPG6_IN (0xcfff)
 
-
+//sdram related
+#define SDRAM_BASE 0x30000000
+#define SDRAM_CODE_BASE (SDRAM_BASE + (4096*4))
 
 #endif

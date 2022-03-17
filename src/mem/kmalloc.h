@@ -3,8 +3,10 @@
 
 #define SECTION_SIZE (1 << 20)
 
-#include "bits.h"
+#include "base/bits.h"
+#include "base/types.h"
 #include "freelist.h"
+
 typedef struct s_meminfo {
     uint32_t heap_start;
     uint32_t heap_end;
@@ -18,6 +20,7 @@ extern int _memerr;
 
 void kmalloc_init(void);
 void *kmalloc(int size);
+void *kzmalloc(int size);
 void *kcalloc(uint32_t items, uint32_t count);
 void kfree(void *ptr);
 void *krealloc(void *ptr, int new_size);

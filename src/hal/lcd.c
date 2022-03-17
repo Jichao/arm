@@ -1,7 +1,6 @@
 #include "lcd.h"
-#include "common.h"
-#include "clock.h"
-#include "kmalloc.h"
+#include "hal/clock.h"
+#include "mem/kmalloc.h"
 
 #define TD35_VCLK 7.1
 #define TD35_VBPD 0
@@ -87,7 +86,7 @@ void lcd_init(void)
    	TCONSEL &= ~((1<<4) | 1);
 }
 
-void lcd_power(BOOL invpwren, BOOL pwren)
+void lcd_power(bool invpwren, bool pwren)
 {
     GPGCON = (GPGCON & (~(3 << 8))) | (3 << 8); // GPG4用作LCD_PWREN
     GPGUP = (GPGUP & (~(1 << 4))) | (1 << 4);   // 禁止内部上拉
@@ -97,7 +96,7 @@ void lcd_power(BOOL invpwren, BOOL pwren)
     LCDCON5 = (LCDCON5 & (~(1 << 3))) | (pwren << 3); // 设置是否输出LCD_PWREN
 }
 
-void lcd_enable(BOOL on)
+void lcd_enable(bool on)
 {
     if (on) {
         LCDCON1 |= 1;

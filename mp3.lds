@@ -9,7 +9,7 @@ SDRAM 64M
 SECTIONS {
     . = 0x30000000;
     _ram_start = .;
-    .init : { build/init.o(.text) build/main.o(.text) }
+    .init : { build/hal/init.o(.text) build/entry/main.o(.text) }
     .text : { *(.text) }
     .rodata ALIGN(4) : AT((LOADADDR(.text)+SIZEOF(.text)+3)&~(0x03)) {*(.rodata*)} 
     .data ALIGN(4)   : AT((LOADADDR(.rodata)+SIZEOF(.rodata)+3)&~(0x03)) { *(.data) }
