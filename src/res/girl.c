@@ -1,4 +1,4 @@
-#include "common.h"
+#include "options.h"
 
 #ifdef DISABLE_GIRL
 unsigned char girl_180x320[] = {0};

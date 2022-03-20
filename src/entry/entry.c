@@ -1,5 +1,5 @@
 #include "entry/entry.h"
-#include "common.h"
+#include "base/common.h"
 #include "audio/mp3.h"
 #include "audio/wav.h"
 #include "audio/audio.h"
@@ -205,6 +205,7 @@ void entry(void)
     printf("interupt inited\r\n");
 
     thread_t* th = schd_init(&test_suite);
+    dprintk("schd timer state : %d\r\n", _schd.timer->state);
     thread_set_name(th, "test thread");
     thread_t* counter_th = thread_create(&counter);
     thread_set_name(counter_th, "counter thread");
@@ -218,13 +219,15 @@ void entry(void)
     __asm__ (
         "mov sp, %0\r\n"
         :
-        : "r"(th->stack)
+        : "r"(th->context.sp)
         :"sp"
     );
     printk("after set sp\r\n");
     dump_current_context();
 
+    dprintk("schd timer state : %d\r\n", _schd.timer->state);
     init_timer();
+    dprintk("schd timer state : %d\r\n", _schd.timer->state);
     schd_start();
     test_suite(nullptr);
 }

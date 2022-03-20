@@ -1,4 +1,4 @@
-#include "common.h"
+#include "base/common.h"
 #include "schd/timer.h"
 #include "schd/schd.h"
 #include "hal/2440addr.h"
@@ -54,11 +54,12 @@ void dispatch_timer(uint32_t* pc_ptr)
     while (TRUE) {
         timer = (ktimer_t *)heap_top(_timer_queue);
         if (!timer) {
+            // dprintk("no timer\r\n");
             break;
         }
         
         if (timer->state == kTimer_Cancelled) {
-            // dprintk("timer cancelled\r\n");
+            dprintk("timer cancelled\r\n");
             heap_pop(_timer_queue);
         }
         if (timer->state == kTimer_Destroyed) {
@@ -181,6 +182,8 @@ int timer_start(ktimer_t *timer)
         dprintk("heap append timer %p\r\n", timer);
         heap_append(_timer_queue, timer);
         return 0;
+    } else {
+        dprintk("start timer failed, timer state: %d\r\n", timer->state);
     }
     return -1;
 }

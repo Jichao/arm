@@ -45,13 +45,13 @@ $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(OBJCOPY) -O binary -S $(ELF) $(BINARY)
 	$(OBJDUMP) -D -m arm $(ELF) > $(DISASSM)
 
-$(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.S
+$(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.S	
 	$(dir_guard)
 	arm-linux-gcc $(CFLAGS) -c $^ -o $@
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.c
 	$(dir_guard)
-	arm-linux-gcc $(CFLAGS) -c $^ -o $@
+	arm-linux-gcc $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -rf build

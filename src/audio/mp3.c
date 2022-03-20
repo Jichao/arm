@@ -1,5 +1,5 @@
 #include "mp3.h"
-#include "common.h"
+#include "base/common.h"
 #include "mad.h"
 
 /*

@@ -2,7 +2,7 @@
 #include "hal/clock.h"
 #include "audio/mp3.h"
 #include "mem/kmalloc.h"
-#include "common.h"
+#include "base/common.h"
 #include "mad.h"
 #include "schd/timer.h"
 

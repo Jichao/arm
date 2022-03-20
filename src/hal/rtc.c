@@ -1,5 +1,5 @@
 #include "rtc.h"
-#include "common.h"
+#include "base/common.h"
 
 #define RTCCON (*(volatile uint32_t*)0x57000040)
 #define BCDSEC (*(volatile uint8_t*)0x57000070)

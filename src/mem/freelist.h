@@ -1,7 +1,7 @@
 #ifndef _FREELIST_HEADER_
 #define _FREELIST_HEADER_
 
-#include "common.h"
+#include "base/common.h"
 
 typedef struct s_freelist {
     struct s_freelist* next;

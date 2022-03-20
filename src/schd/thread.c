@@ -23,7 +23,7 @@ thread_t* thread_create(thread_func_t entry)
     memset(&thread->context, 0, sizeof(cpu_context_t));
     thread->context.pc = entry;
     thread->context.lr = &thread_exit;
-    thread->context.sp = thread->stack;
+    thread->context.sp = thread->stack + thread->stack_size;
     return thread;
 }
 

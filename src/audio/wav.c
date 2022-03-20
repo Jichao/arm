@@ -1,6 +1,6 @@
 #include "audio/wav.h"
 #include "mem/kmalloc.h"
-#include "common.h"
+#include "base/common.h"
 #include "../lib/libc/src/string.h"
 
 #ifdef TEST

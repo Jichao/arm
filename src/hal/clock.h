@@ -1,7 +1,7 @@
 #ifndef _CLOCK_HEADER_
 #define _CLOCK_HEADER_
 
-#include "common.h"
+#include "base/common.h"
 
 #define FIN_FREQ 12
 

@@ -1,7 +1,7 @@
 #ifndef _RTC_HEADER_
 #define _RTC_HEADER_
 
-#include "common.h"
+#include "base/common.h"
 
 void output_time(void);
 void reset_time(void);
