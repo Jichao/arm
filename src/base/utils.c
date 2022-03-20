@@ -36,7 +36,7 @@ void dump_current_context(void)
     uint32_t* regs = nullptr;
     uint32_t cpsr;
     __asm__ (
-        "stmdb sp!, {r0-r12,r14-r15}\n"
+        "stmdb sp!, {r0-r12,r14}\n"
         "mov %0, sp\n"
         "mrs %1, cpsr"
         :"=r"(regs),"=r"(cpsr)
@@ -48,12 +48,12 @@ void dump_current_context(void)
            regs[2], regs[3], regs[4]);
     printk("r5: 0x%x r6: 0x%x r7: 0x%x r8: 0x%x r9: 0x%x\r\n", regs[5], regs[6],
            regs[7], regs[8], regs[9]);
-    printk("r10: 0x%x r11: 0x%x r12: 0x%x r13: 0x%x r14: 0x%x\r\n", regs[10], regs[11],
-           regs[12], regs - 64, regs[13]);
-    printk("pc: 0x%x cpsr: 0x%x\r\n", regs[14], cpsr);
+    printk("r10: 0x%x r11: 0x%x r12: 0x%x\r\n", regs[10], regs[11],
+           regs[12]);
+    printk("sp: 0x%x lr: 0x%x cpsr: 0x%x\r\n", regs - 56, regs[13], cpsr);
 
     __asm__ (
-        "add sp, sp, #60\n"
+        "add sp, sp, #56\n"
         :::"sp"
     );
 }
