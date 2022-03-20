@@ -4,7 +4,7 @@
 #include "mem/kmalloc.h"
 #include "common.h"
 #include "mad.h"
-#include "timer.h"
+#include "schd/timer.h"
 
 #define WAVE_FORMAT_PCM 0x0001
 #define L3M (1 << 2) // GPB2 = L3MODE

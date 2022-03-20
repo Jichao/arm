@@ -17,9 +17,14 @@
         printf(__VA_ARGS__); \
     }
 
+#define printk(...) \
+        printf("%s(%d): %s :", __FILE__, __LINE__, __FUNCTION__); \
+        printf(__VA_ARGS__); \
+
 uint32_t jround(uint32_t value, uint32_t align, bool up); 
 int roundf(float a);
 uint32_t buff_to_u32(unsigned char* buff);
 void abort(void);
+void dump_current_context(void);
 
 #endif

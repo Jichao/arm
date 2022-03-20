@@ -29,6 +29,7 @@ _irq:
     sub lr, lr, #4
     stmdb sp!, {r0-r12, lr}
     ldr lr, =irq_ret
+    mov r0, sp
     b irq_handler
 irq_ret:
     ldmia sp!, {r0-r12, pc}^

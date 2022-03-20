@@ -1,9 +1,10 @@
+#include "base/macros.h"
 #include "hal/2440addr.h"
 #include "hal/led.h"
 #include "hal/rtc.h"
-#include "base/macros.h"
 #include "hal/int.h"
-#include "timer.h"
+#include "schd/timer.h"
+#include <string.h>
 
 extern uint32_t _irq;
 
@@ -18,6 +19,8 @@ extern uint32_t _irq;
 #define FIQ_INTERRUPT 7
 
 #define IRQ_HANDLER_ADDR (*(volatile uint32_t*)0x33f80440)
+
+cpu_context_t _irq_context;
 
 typedef struct tag_switch_conf {
     int eint_index;
@@ -41,6 +44,7 @@ void interrupt_init(void)
     //gpg-eint map: 0-8 3-11 5-13 6-14
     GPGCONF &= ~(3 | 3 << 6 | 3 << 10 | 3 << 12);
     GPGCONF |= (2 | 2 << 6 | 2 << 10 | 2 << 12);
+    //进入irq模式
     __asm__ (
         "msr cpsr_c, 0xd3"
     );
@@ -53,6 +57,8 @@ void interrupt_init(void)
     *(&IRQ_HANDLER_ADDR + 2) = (uint32_t)&_irq;
     EINTMASK &= ~((1 << 8) | (1 << 11) | (1 << 13) | (1 << 14));
     INTMSK &= ~(1 << EINT8_23_OFF) & ~(1 << INT_TIMER0_OFF);
+
+    //回到svc模式
     __asm__ (
         "msr cpsr_c, 0x53"
     );
@@ -83,10 +89,15 @@ void switch_handler(void)
     }
 }
 
-void irq_handler(void)
+void irq_handler(void* context) 
 {
-    uint32_t off = INTOFFSET;
+    //r0-r12 + pc
+    //save prev context
+    uint32_t* regs = (uint32_t*)((char*)context - 14 * sizeof(uint32_t));
+    memcpy(&_irq_context.regs, regs, sizeof(uint32_t)*13);
+    memcpy(&_irq_context.pc, (char*)context - 4, 4);
 
+    uint32_t off = INTOFFSET;
     if (off == EINT8_23_OFF) {
         switch_handler();
         // handle_led(8, 0);
@@ -94,7 +105,9 @@ void irq_handler(void)
         // handle_led(13, 2);
         // handle_led(14, 3);
     } else if (off == INT_TIMER0_OFF) {
-        handle_timer0_interrupt();
+        handle_timer0_interrupt((uint32_t*)((char*)context - 4));
+    } else {
+        printk("unsupported interrupt index: %d\r\n", off); 
     }
     SRCPND = 1<<off;
     INTPND = 1<<off;
@@ -140,7 +153,7 @@ void exception_handler(int index, uint32_t lastpc)
     while (1) ; 
 }
 
-uint32_t saved_intmsk;
+volatile uint32_t saved_intmsk;
 
 //禁用中断
 void disable_irq(void)

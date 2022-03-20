@@ -1,7 +1,7 @@
 #include "common.h"
-#include "nand.h"
-#include "timer.h"
-#include "clock.h"
+#include "hal/nand.h"
+#include "hal/clock.h"
+#include "schd/timer.h"
 
 #define NAND_PAGE_SIZE 2048
 #define NAND_PAGE_ADDR_MASK (NAND_PAGE_SIZE - 1)

@@ -6,4 +6,7 @@
 #include "base/types.h"
 #include "base/utils.h"
 
+#define DISABLE_MP3
+#define DISABLE_GIRL
+
 #endif

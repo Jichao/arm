@@ -1,9 +1,9 @@
 #include "entry/entry.h"
+#include "common.h"
 #include "audio/mp3.h"
 #include "audio/wav.h"
-#include "base/spinlock.h"
-#include "common.h"
-#include "hal/audio.h"
+#include "audio/audio.h"
+#include "schd/spinlock.h"
 #include "hal/clock.h"
 #include "hal/int.h"
 #include "hal/lcd.h"
@@ -12,7 +12,8 @@
 #include "mem/kmalloc.h"
 #include "res/apple_wav.h"
 #include "res/girl.h"
-#include "timer.h"
+#include "schd/timer.h"
+#include "schd/schd.h"
 
 extern char _ram_start;
 extern char _bss_end;
@@ -72,12 +73,12 @@ spinlock_t lock = 0;
 void end_timer(void)
 {
     if (timer1) {
-        destroy_timer(timer1);
+        timer_destroy(timer1);
         timer1 = NULL;
     }
 
     if (timer2) {
-        destroy_timer(timer2);
+        timer_destroy(timer2);
         timer2 = NULL;
     }
 }
@@ -109,8 +110,8 @@ void test_timer(void)
 {
     dprintk("start test timer...\r\n");
     timer1 =
-        create_timer(10, TRUE, (timer_callback_t)&on_timer1, (void *)1, TRUE);
-    timer2 = create_timer(2000, TRUE, (timer_callback_t)&on_timer2, NULL, TRUE);
+        timer_create(10, TRUE, (timer_callback_t)&on_timer1, (void *)1, TRUE);
+    timer2 = timer_create(2000, TRUE, (timer_callback_t)&on_timer2, NULL, TRUE);
     set_switch_callback(1, &on_switch1, NULL);
 
     done = 0;
@@ -133,22 +134,8 @@ void test_timer(void)
            main_count, isr_count, main_count + isr_count, target);
 }
 
-void entry(void)
+int test_suite(void* cb)
 {
-    printf("bbs end %p ram start %p rom size %x\r\n", &_bss_end, &_ram_start,
-           ((int)&_bss_end - (int)&_ram_start));
-    kmalloc_init();
-
-    init_timer();
-
-    printf("led inited\r\n");
-    led_init();
-
-    printf("fclk %d hclk %d pclk %d\r\n", get_fclk(), get_hclk(), get_pclk());
-    printf("before interrupt inited\r\n");
-    interrupt_init();
-    printf("interupt inited\r\n");
-
     int c = 0;
 
     while (1) {
@@ -187,4 +174,57 @@ void entry(void)
             break;
         };
     }
+    return 0;
+}
+
+int counter(void* cb)
+{
+    int count = 0;
+    while (true) {
+        if ((count % 1000) == 0) {
+            dprintk("counter thread count %d\r\n", count++);
+        }
+    }
+    return 0;
+}
+
+void entry(void)
+{
+    printf("bbs end %p ram start %p rom size %x\r\n", &_bss_end, &_ram_start,
+           ((int)&_bss_end - (int)&_ram_start));
+    kmalloc_init();
+
+
+    printf("led inited\r\n");
+    led_init();
+
+    printf("fclk %d hclk %d pclk %d\r\n", get_fclk(), get_hclk(), get_pclk());
+
+    printf("before interrupt inited\r\n");
+    interrupt_init();
+    printf("interupt inited\r\n");
+
+    thread_t* th = schd_init(&test_suite);
+    thread_set_name(th, "test thread");
+    thread_t* counter_th = thread_create(&counter);
+    thread_set_name(counter_th, "counter thread");
+    schd_add_thread(counter_th);
+
+    dump_thread(th);
+    dump_thread(counter_th);
+
+    printk("before set sp\r\n");
+    dump_current_context();
+    __asm__ (
+        "mov sp, %0\r\n"
+        :
+        : "r"(th->stack)
+        :"sp"
+    );
+    printk("after set sp\r\n");
+    dump_current_context();
+
+    init_timer();
+    schd_start();
+    test_suite(nullptr);
 }
