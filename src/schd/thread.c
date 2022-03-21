@@ -43,12 +43,17 @@ void thread_destroy(thread_t* thread)
     kfree(thread);
 }
 
-void dump_thread(thread_t* thread)
+void dump_cpu_context(cpu_context_t* c)
 {
-    cpu_context_t* c = &thread->context;
-    printk("thread: %p name: %s tid: %d stack:  %p\r\n", thread, thread->name, thread->tid, thread->stack);
     printk("pc: 0x%x lr: 0x%x sp: 0x%x r0: 0x%x r1: 0x%x\r\n", c->pc, c->lr, c->sp, c->regs[0], c->regs[1]);
     printk("r2: 0x%x r3: 0x%x r4: 0x%x r5: 0x%x r6: 0x%x\r\n", c->regs[2], c->regs[3], c->regs[4], c->regs[5], c->regs[6]);
     printk("r7: 0x%x r8: 0x%x r9: 0x%x r10: 0x%x r11: 0x%x\r\n", c->regs[7], c->regs[8], c->regs[9], c->regs[10], c->regs[11]);
     printk("r12: 0x%x \r\n", c->regs[12]);
+}
+
+void dump_thread(thread_t* thread)
+{
+    cpu_context_t* c = &thread->context;
+    printk("thread: %p name: %s tid: %d stack:  %p\r\n", thread, thread->name, thread->tid, thread->stack);
+    dump_cpu_context(c);
 }

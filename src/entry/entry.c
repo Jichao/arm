@@ -179,10 +179,11 @@ int test_suite(void* cb)
 
 int counter(void* cb)
 {
-    int count = 0;
+    volatile int count = 0;
     while (true) {
-        if ((count % 1000) == 0) {
-            dprintk("counter thread count %d\r\n", count++);
+        count++;
+        if ((count % 10000) == 0) {
+            printk("count = %d\r\n", count);
         }
     }
     return 0;
@@ -193,7 +194,6 @@ void entry(void)
     printf("bbs end %p ram start %p rom size %x\r\n", &_bss_end, &_ram_start,
            ((int)&_bss_end - (int)&_ram_start));
     kmalloc_init();
-
 
     printf("led inited\r\n");
     led_init();
@@ -211,23 +211,11 @@ void entry(void)
     thread_set_name(counter_th, "counter thread");
     schd_add_thread(counter_th);
 
-    dump_thread(th);
-    dump_thread(counter_th);
+    printk("before schd dump\r\n");
+    schd_dump();
+    printk("curr thread next pointer: %p\r\n", &_schd.curr_thread->list.next);
 
-    printk("before set sp\r\n");
-    dump_current_context();
-    __asm__ (
-        "mov sp, %0\r\n"
-        :
-        : "r"(th->context.sp)
-        :"sp"
-    );
-    printk("after set sp\r\n");
-    dump_current_context();
-
-    dprintk("schd timer state : %d\r\n", _schd.timer->state);
     init_timer();
-    dprintk("schd timer state : %d\r\n", _schd.timer->state);
     schd_start();
     test_suite(nullptr);
 }

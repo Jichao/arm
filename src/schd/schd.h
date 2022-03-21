@@ -18,7 +18,8 @@ extern schd_t _schd;
 
 thread_t* schd_init(thread_func_t entry);
 void schd_start(void);
-void schd_switch(void);
+void* schd_switch_imp(void* sp, void* lr);
+void schd_dump(void);
 
 void schd_add_thread(thread_t* thread);
 void schd_suspend_thread(thread_t* thread);

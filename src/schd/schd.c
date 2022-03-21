@@ -11,7 +11,7 @@
 
 schd_t _schd;
 
-#define TIME_SLICE 6000
+#define TIME_SLICE 600
 
 int schd_run(void *cb);
 
@@ -45,57 +45,43 @@ thread_t *schd_init(thread_func_t entry)
 void schd_add_thread(thread_t *thread)
 {
     dlist_append(_schd.threads, &thread->list);
+    _schd.thread_count++;
 }
 
 void schd_start(void) { timer_start(_schd.timer); }
 
-static void switch_to_next(void)
+static void* switch_to_next(void)
 {
-    disable_irq();
     memcpy(&_schd.curr_thread->context, &_irq_context, sizeof(cpu_context_t));
-
-    printk("curr thread = %p name = %s\r\n", _schd.curr_thread, _schd.curr_thread->name);
-    dump_thread(_schd.curr_thread);
-
+    printk("===before switch===\r\n");
+    schd_dump();
     thread_t* thread = (thread_t*)_schd.curr_thread->list.next;
     if (!thread) {
         thread = (thread_t*)_schd.threads->head;
     }
     _schd.curr_thread = thread;
-
-    printk("switch to next thread = %s\r\n", _schd.curr_thread->name);
-    dump_thread(_schd.curr_thread);
-
-    //restore various regs
-    __asm__(
-        "mov r0, %[context]\n"
-        "ldmia r0, {r0-r14}\n"
-        :
-        :[context]"r"(&_schd.curr_thread->context)
-    );
-
-    restore_irq();
-    //restore the pc
-    __asm__(
-        "mov pc, %0\n"
-        :
-        :"r"(_schd.curr_thread->context.pc)
-    );
+    return &thread->context;
 }
 
-void schd_switch(void)
+void* schd_switch_imp(void* sp, void* lr)
 {
-    printk("schd_switch called\r\n");
-    //save sp and lr
-    __asm__(
-        "mov %0, sp\n"
-        "mov %1, lr"
-        :"=r"(_irq_context.sp),"=r"(_irq_context.lr)
-        :
-    );
-    switch_to_next();
+    _irq_context.sp = sp;
+    _irq_context.lr = lr;
+    return switch_to_next();
 }
 
 void thread_suspend(thread_t *thread) { thread->state = kThread_Suspend; }
 
 void thread_yield(void) {}
+
+void schd_dump(void)
+{
+    printk("thread count = %d\r\n", _schd.thread_count);
+    printk("curr thread = %s\r\n", _schd.curr_thread->name);
+    printk("next thread = %s\r\n", ((thread_t*)_schd.curr_thread->list.next)->name);
+    dlist_entry_t* entry = _schd.threads->head;
+    for (; entry!= nullptr; entry = entry->next)
+    {
+        dump_thread((thread_t*)entry);
+    }
+}

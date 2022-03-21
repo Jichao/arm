@@ -91,12 +91,11 @@ void switch_handler(void)
 
 void irq_handler(void* context) 
 {
+    void* pc_ptr = context + 13 * 4;
     //r0-r12 + pc
     //save prev context
-    uint32_t* regs = (uint32_t*)((char*)context - 14 * sizeof(uint32_t));
-    memcpy(&_irq_context.regs, regs, sizeof(uint32_t)*13);
-    memcpy(&_irq_context.pc, (char*)context - 4, 4);
-
+    memcpy(&_irq_context.regs, context, sizeof(uint32_t)*13);
+    memcpy(&_irq_context.pc, (char*)pc_ptr, 4);
     uint32_t off = INTOFFSET;
     if (off == EINT8_23_OFF) {
         switch_handler();
@@ -105,7 +104,8 @@ void irq_handler(void* context)
         // handle_led(13, 2);
         // handle_led(14, 3);
     } else if (off == INT_TIMER0_OFF) {
-        handle_timer0_interrupt((uint32_t*)((char*)context - 4));
+        handle_timer0_interrupt((uint32_t*)pc_ptr);
+        // printk("after handle timer0 interrupt")
     } else {
         printk("unsupported interrupt index: %d\r\n", off); 
     }

@@ -23,6 +23,7 @@ void dlist_append(dlist_t *dlist, dlist_entry_t *entry)
     if (!dlist->tail) {
         kassert(!dlist->head, "no tail should empty\r\n");
         dlist_init(dlist, entry);
+        return;
     }
     kassert(dlist->tail->next == NULL, "tail next should be nullptr");
     entry->next = nullptr;

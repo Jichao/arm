@@ -38,5 +38,6 @@ void thread_start(thread_t* thread);
 void thread_destroy(thread_t* thread);
 void thread_set_name(thread_t* thread, const char* name);
 void dump_thread(thread_t* thread);
+void dump_cpu_context(cpu_context_t* c);
 
 #endif

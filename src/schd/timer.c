@@ -4,11 +4,14 @@
 #include "hal/2440addr.h"
 #include "hal/clock.h"
 #include "mem/kmalloc.h"
+#include "hal/int.h"
 #include "schd.h"
 
 volatile uint32_t _tick = 0;
 
 heap_t *_timer_queue;
+
+extern void schd_switch(void);
 
 int compare_timer(heap_element_t a, heap_element_t b)
 {
@@ -79,9 +82,13 @@ void dispatch_timer(uint32_t* pc_ptr)
                     timer->state = kTimer_Done;
                 }
                 if (timer == _schd.timer) {
+                    dprintk("=== dump irq context ===\r\n");
+                    dump_cpu_context(&_irq_context);
                     dprintk("sche timer expired start switch thread\r\n");
+                    disable_irq();
                     *pc_ptr = (uint32_t)&schd_switch;
-                } else if (timer->callback) {
+                }
+                else if (timer->callback) {
                     dprintk("call timer callback\r\n");
                     timer->callback(timer->cb);
                 }
