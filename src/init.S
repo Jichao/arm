@@ -21,7 +21,7 @@ reset:
     #msr cpsr_c, 0xd2
     #mov sp, #3072
     #msr cpsr_c, 0xd3
-    bl main
+    bl reset_entry
 _loop:
     b _loop
 

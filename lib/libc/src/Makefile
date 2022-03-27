@@ -1,6 +1,10 @@
-CFLAGS 	:= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer -ffreestanding -I../include
-AR := arm-linux-ar 
-CC := arm-linux-gcc
+CFLAGS 	:= -march=armv4t -mcpu=arm920t -Wall -Wstrict-prototypes -g -fomit-frame-pointer -ffreestanding -I../include
+
+#AR := arm-linux-ar 
+#CC := arm-linux-gcc
+
+AR := arm-none-eabi-ar 
+CC := arm-none-eabi-gcc
 
 objs := div64.o lib1funcs.o ctype.o muldi3.o printf.o string.o vsprintf.o
 

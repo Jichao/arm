@@ -33,7 +33,7 @@ void disable_alignment_check(void)
     );
 }
 
-int main(void)
+int reset_entry(void)
 {
     /*  
     clock_init();

@@ -106,7 +106,8 @@ void init_iis(uint32_t fs, uint32_t bits_per_sample, uint32_t channels)
 {
     // iis psr
     uint32_t codeclk = fs * 384;
-    int divider = roundf(get_pclk() * 1000 * 1000. / codeclk) - 1;
+    float pclk = get_pclk() * 1000 * 1000;
+    int divider = roundf(pclk / codeclk) - 1;
     printf("divider = %d\r\n", divider);
     IISPSR = divider << 5 | divider;
 

@@ -1,14 +1,20 @@
-CC := arm-linux-gcc
-OBJCOPY := arm-linux-objcopy
-OBJDUMP := arm-linux-objdump
+#CC := arm-linux-gcc
+#OBJCOPY := arm-linux-objcopy
+#OBJDUMP := arm-linux-objdump
+#LD := arm-linux-ld
 
-GCC_LIB_DIR := /home/book/FriendlyARM/toolschain/4.4.3/lib/gcc/arm-none-linux-gnueabi/4.4.3
+CC := arm-none-eabi-gcc
+OBJCOPY := arm-none-eabi-objcopy
+OBJDUMP := arm-none-eabi-objdump
+LD := arm-none-eabi-ld
 
-CFLAGS 	:= -nostdinc -fno-builtin -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer \
+#GCC_LIB_DIR := /home/book/FriendlyARM/toolschain/4.4.3/lib/gcc/arm-none-linux-gnueabi/4.4.3
+GCC_LIB_DIR := /home/jcyangzh/apps/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi/lib/gcc/arm-none-eabi/11.2.1
+
+CFLAGS 	:= -march=armv4t -mcpu=arm920t -mfloat-abi=soft -mlittle-endian -nostdinc -fno-builtin -Wall -Wstrict-prototypes -g -fomit-frame-pointer \
 	-ffreestanding -std=c99 \
 	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++
 
-LD := arm-linux-ld
 LDFLAGS := -lgcc -L$(GCC_LIB_DIR)
 
 SOURCE_DIR := src
@@ -49,10 +55,10 @@ $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(OBJDUMP) -D -m arm $(ELF) > $(DISASSM)
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.S
-	arm-linux-gcc $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.c
-	arm-linux-gcc $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
 	rm -rf build

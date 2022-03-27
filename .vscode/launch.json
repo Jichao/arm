@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerPath": "arm-none-eabi-gdb",
+            "program": "${workspaceRoot}/build/mp3.elf",
+            "setupCommands": [
+                {
+                    "text": "file ${workspaceRoot}/build/mp3.elf"
+                },
+                {
+                    "text": "target remote 127.0.0.1:2331"
+                },
+                {
+                    "text": "monitor halt"
+                }, 
+                {
+                    "text": "monitor loadbin ${workspaceRoot}/build/mp3.bin 0x30000000"
+                },
+                {
+                    "text": "monitor reg pc=0x30000000"
+                },
+            ],
+            "launchCompleteCommand": "None",
+            "externalConsole": true,
+            "cwd": "${workspaceRoot}"
+        }
+    ]
+}
