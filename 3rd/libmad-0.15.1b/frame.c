@@ -32,7 +32,6 @@
 #include "layer12.h"
 #include "layer3.h"
 #include "stream.h"
-#include "timer.h"
 
 static unsigned long const bitrate_table[5][15] = {
     /* MPEG-1 */

@@ -5802,7 +5802,7 @@ AC_DEFUN([_LT_AC_FILE_LTDLL_C], [
 # #ifdef __cplusplus
 # extern "C" {
 # #endif
-# BOOL APIENTRY DllMain (HINSTANCE hInst, DWORD reason, LPVOID reserved);
+# bool APIENTRY DllMain (HINSTANCE hInst, DWORD reason, LPVOID reserved);
 # #ifdef __cplusplus
 # }
 # #endif
@@ -5813,7 +5813,7 @@ AC_DEFUN([_LT_AC_FILE_LTDLL_C], [
 # #endif
 # HINSTANCE __hDllInstance_base;
 #
-# BOOL APIENTRY
+# bool APIENTRY
 # DllMain (HINSTANCE hInst, DWORD reason, LPVOID reserved)
 # {
 #   __hDllInstance_base = hInst;

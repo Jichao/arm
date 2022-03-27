@@ -13,7 +13,7 @@ GCC_LIB_DIR := /home/jcyangzh/apps/gcc-arm-11.2-2022.02-x86_64-arm-none-eabi/lib
 
 CFLAGS 	:= -march=armv4t -mcpu=arm920t -mfloat-abi=soft -mlittle-endian -nostdinc -fno-builtin -Wall -Wstrict-prototypes -g -fomit-frame-pointer \
 	-ffreestanding -std=c99 \
-	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++
+	 -Ilib/libc/include -I3rd/libmad-0.15.1b/msvc++ -Isrc
 
 LDFLAGS := -lgcc -L$(GCC_LIB_DIR)
 
@@ -36,18 +36,15 @@ ELF := $(BUILD_DIR)/$(NAME).elf
 BINARY := $(patsubst %.elf, %.bin, $(ELF))
 DISASSM := $(patsubst %.elf, %.dis, $(ELF))
 
+dir_guard=@mkdir -p $(@D)
+
 .PHONY: all clean test setup libs
 
-all: setup libs $(BINARY)
+all: libs $(BINARY)
 
 libs:
 	cd lib/libc/src; make; cd ../../;
 	cd 3rd/libmad-0.15.1b; make -f makefile.arm; cd ../../;
-
-setup: build
-
-build:
-	mkdir -p build
 
 $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(LD) -T$(NAME).lds -o $(ELF) $^ $(LDFLAGS)
@@ -55,9 +52,11 @@ $(BINARY): $(OBJECTS) $(C_LIB) $(MP3_LIB)
 	$(OBJDUMP) -D -m arm $(ELF) > $(DISASSM)
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.S
+	$(dir_guard)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(BUILD_DIR)/%.o:$(SOURCE_DIR)/%.c
+	$(dir_guard)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:

@@ -8,16 +8,16 @@ extern unsigned char getc(void);
 #define	OUTBUFSIZE	1024
 #define	INBUFSIZE	1024
 
-
-static unsigned char g_pcOutBuf[OUTBUFSIZE];
-static unsigned char g_pcInBuf[INBUFSIZE];
-
+/*static unsigned char g_pcOutBuf[OUTBUFSIZE];
+static unsigned char g_pcInBuf[INBUFSIZE];*/
 
 int printf(const char *fmt, ...)
 {
 	int i;
 	int len;
 	va_list args;
+
+	unsigned char g_pcOutBuf[OUTBUFSIZE];
 
 	va_start(args, fmt);
 	len = vsprintf((char *)g_pcOutBuf,fmt,args);
@@ -29,14 +29,14 @@ int printf(const char *fmt, ...)
 	return len;
 }
 
-
-
 int scanf(const char * fmt, ...)
 {
 	int i = 0;
 	unsigned char c;
 	va_list args;
 	
+	unsigned char g_pcInBuf[INBUFSIZE];
+
 	while(1)
 	{
 		c = getc();
@@ -58,4 +58,3 @@ int scanf(const char * fmt, ...)
 
 	return i;
 }
-
