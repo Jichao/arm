@@ -2,6 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "gdb",
+            "request": "launch",
+            "name": "Attach to gdbserver",
+            "target": "${workspaceRoot}/build/mp3.elf",
+            "cwd": "${workspaceRoot}",
+            "gdbpath": "arm-none-eabi-gdb",
+            "autorun": [
+                "file ${workspaceRoot}/build/mp3.elf",
+                "target remote 127.0.0.1:2331",
+                "monitor halt",
+                "monitor loadbin ${workspaceRoot}/build/mp3.bin 0x30000000",
+                "monitor reg pc=0x30000000",
+                "monitor go"
+            ]
+        },
+        {
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
