@@ -22,7 +22,7 @@
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
-#define UDEBUG 1
+#define UDEBUG 0
 
 #define kassert(cond, ...) \
     if (!cond) { \

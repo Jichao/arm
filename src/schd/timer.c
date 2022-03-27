@@ -83,7 +83,7 @@ void dispatch_timer(uint32_t* pc_ptr)
                 }
                 if (timer == _schd.timer) {
                     dprintk("=== dump irq context ===\r\n");
-                    dump_cpu_context(&_irq_context);
+                    // dump_cpu_context(&_irq_context);
                     dprintk("sche timer expired start switch thread\r\n");
                     disable_irq();
                     *pc_ptr = (uint32_t)&schd_switch;

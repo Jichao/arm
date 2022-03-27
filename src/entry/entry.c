@@ -134,6 +134,8 @@ void test_timer(void)
            main_count, isr_count, main_count + isr_count, target);
 }
 
+volatile int _count = 0;
+
 int test_suite(void* cb)
 {
     int c = 0;
@@ -146,6 +148,7 @@ int test_suite(void* cb)
         printf("  3. play mp3 sync test\r\n");
         printf("  4. play mp3 async test\r\n");
         printf("  5. timer test\r\n");
+        printf("  6. get counter value\r\n");
 
         char choice = getc();
         if (c == 5) {
@@ -170,6 +173,9 @@ int test_suite(void* cb)
         case 5:
             test_timer();
             break;
+        case 6:
+            printf("current count value = %d\r\n", _count);
+            break;
         default:
             break;
         };
@@ -177,14 +183,11 @@ int test_suite(void* cb)
     return 0;
 }
 
+
 int counter(void* cb)
 {
-    volatile int count = 0;
     while (true) {
-        count++;
-        if ((count % 10000) == 0) {
-            printk("count = %d\r\n", count);
-        }
+        _count++;
     }
     return 0;
 }

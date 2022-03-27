@@ -53,8 +53,8 @@ void schd_start(void) { timer_start(_schd.timer); }
 static void* switch_to_next(void)
 {
     memcpy(&_schd.curr_thread->context, &_irq_context, sizeof(cpu_context_t));
-    printk("===before switch===\r\n");
-    schd_dump();
+    // printk("===before switch===\r\n");
+    // schd_dump();
     thread_t* thread = (thread_t*)_schd.curr_thread->list.next;
     if (!thread) {
         thread = (thread_t*)_schd.threads->head;
